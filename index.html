@@ -14,7 +14,7 @@
 <div id="loader">
   <canvas id="starfield"></canvas>
   <div class="loader-content">
-    <div class="loader-title">PROJECT ATLAS</div>
+    <div class="loader-title">PROJECT ATLAS <br> (BETA)</div>
     <div class="loader-subtitle">Budget Control System</div>
     <div class="loader-bar-wrap"><div class="loader-bar-fill" id="loaderFill"></div></div>
     <div class="loader-pct" id="loaderPct">0%</div>
@@ -30,10 +30,20 @@
   <div class="nebula n4"></div>
 </div>
 
+<!-- CONFETTI CANVAS -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- UNDO TOAST -->
+<div id="undoToast" class="undo-toast">
+  <span id="undoMsg">Transaction deleted</span>
+  <button onclick="undoDelete()">Undo</button>
+  <div class="undo-progress" id="undoProgress"></div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <header>
-    <div class="logo"><span class="logo-icon">◈</span><span class="logo-text">PROJECT ATLAS</span></div>
+    <div class="logo"><span class="logo-icon">◈</span><span class="logo-text shimmer-text">PROJECT ATLAS V2.8.6 (BETA)</span></div>
     <div class="header-controls">
       <div class="dropdown">
         <button class="btn hdr-btn"><span id="currencyLabel">USD $</span> ▾</button>
@@ -47,7 +57,7 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class="btn hdr-btn">Theme ▾</button>
+        <button class="btn hdr-btn" data-i18n="theme">Theme ▾</button>
         <div class="dropdown-content">
           <div onclick="setColor('#4ade80')"><span class="swatch" style="background:#4ade80"></span>Green</div>
           <div onclick="setColor('#38bdf8')"><span class="swatch" style="background:#38bdf8"></span>Blue</div>
@@ -63,8 +73,10 @@
   </header>
 
   <div class="container">
-    <div class="card balance-card">
-      <div class="balance-label">TOTAL BALANCE</div>
+    <!-- BALANCE CARD -->
+    <div class="card balance-card" id="balanceCard">
+      <div class="glow-ring"></div>
+      <div class="balance-label" data-i18n="totalBalance">TOTAL BALANCE</div>
       <h2 class="balance-amount"><span id="balanceSign"></span><span id="currencyDisp">$</span><span id="balance">0.00</span></h2>
       <div class="balance-meta">
         <span id="mainDatetime" class="main-dt"></span>
@@ -75,37 +87,76 @@
       </div>
     </div>
 
+    <!-- SAVING GOAL -->
     <div class="card">
-      <h3>Saving Goal</h3>
+      <h3 data-i18n="savingGoal">Saving Goal</h3>
       <div class="goal-row">
         <input id="goal" type="number" placeholder="Set target amount" oninput="updateProgress()">
         <span class="goal-currency" id="goalCurrency">$</span>
       </div>
       <div class="progress" id="progress"><span>0%</span></div>
-      <div class="progress-label" id="progressLabel">Set a goal to track your progress</div>
+      <div class="progress-label" id="progressLabel" data-i18n="setGoal">Set a goal to track your progress</div>
     </div>
 
+    <!-- ANALYTICS CARD -->
+    <div class="card analytics-card" id="analyticsCard">
+      <div class="analytics-header">
+        <h3 data-i18n="analytics">Analytics</h3>
+        <div class="analytics-tabs">
+          <button class="atab active" onclick="switchAnalyticsTab('donut')" id="tab-donut" data-i18n="spending">Spending</button>
+          <button class="atab" onclick="switchAnalyticsTab('bar')" id="tab-bar" data-i18n="monthly">Monthly</button>
+          <button class="atab" onclick="switchAnalyticsTab('line')" id="tab-line" data-i18n="balance">Balance</button>
+        </div>
+      </div>
+      <div id="analyticsContent" class="analytics-content">
+        <div id="panel-donut" class="analytics-panel active">
+          <canvas id="donutChart" width="260" height="260"></canvas>
+          <div id="donutLegend" class="donut-legend"></div>
+          <div id="donutInsight" class="insight-box"></div>
+        </div>
+        <div id="panel-bar" class="analytics-panel">
+          <canvas id="barChart" width="600" height="220"></canvas>
+          <div id="barInsight" class="insight-box"></div>
+        </div>
+        <div id="panel-line" class="analytics-panel">
+          <canvas id="lineChart" width="600" height="220"></canvas>
+          <div id="lineInsight" class="insight-box"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT TRANSACTIONS -->
     <div class="card" id="txPreviewCard">
       <div class="transactions-header">
-        <h3>Recent Transactions</h3>
-        <button class="btn sm-btn" onclick="openTransactionsFull()">View All →</button>
+        <h3 data-i18n="recentTx">Recent Transactions</h3>
+        <button class="btn sm-btn" onclick="openTransactionsFull()" data-i18n="viewAll">View All →</button>
       </div>
       <div id="content"></div>
-      <div id="emptyState" class="empty-state">No transactions yet. Tap <b>+</b> to add one.</div>
+      <div id="emptyState" class="empty-state">
+        <div class="empty-illustration">🚀</div>
+        <span data-i18n="noTx">No transactions yet. Tap <b>+</b> to add one.</span>
+      </div>
     </div>
   </div>
 
-  <button class="fab" onclick="openAdd()" title="Add Transaction">+</button>
+  <!-- FAB GROUP -->
+  <div class="fab-group">
+    <button class="fab fab-secondary" onclick="openConverter()" title="Currency Converter">⇄</button>
+    <button class="fab" onclick="openAdd()" title="Add Transaction">+</button>
+  </div>
 </div>
 
-<!-- ═══ ADD TRANSACTION MODAL ═══ -->
+<!-- ═══ ADD / EDIT TRANSACTION MODAL ═══ -->
 <div id="addMenu" class="modal">
   <div class="modal-content">
-    <div class="modal-header"><h3>New Transaction</h3><button class="modal-close" onclick="closeAdd()">✕</button></div>
-    <div class="field"><label>Name</label><input id="txName" placeholder="e.g. Grocery shopping"></div>
-    <div class="field"><label>Amount</label><input id="txAmount" type="number" placeholder="0.00" min="0" step="0.01"></div>
+    <div class="modal-header">
+      <h3 id="addModalTitle" data-i18n="newTx">New Transaction</h3>
+      <button class="modal-close" onclick="closeAdd()">✕</button>
+    </div>
+    <div class="field"><label data-i18n="name">Name</label><input id="txName" placeholder="e.g. Grocery shopping"></div>
+    <div class="field"><label data-i18n="amount">Amount</label><input id="txAmount" type="number" placeholder="0.00" min="0" step="0.01"></div>
     <div class="field">
-      <label>Category</label>
+      <label data-i18n="category">Category</label>
       <select id="txCategory">
         <option value="General">📋 General</option>
         <option value="Food">🍔 Food</option>
@@ -116,18 +167,19 @@
         <option value="Other">📦 Other</option>
       </select>
     </div>
-    <div class="field"><label>Note <span class="opt-label">(optional)</span></label><textarea id="txNote" placeholder="Add a note…" rows="2"></textarea></div>
+    <div class="field"><label data-i18n="note">Note <span class="opt-label">(optional)</span></label><textarea id="txNote" placeholder="Add a note…" rows="2"></textarea></div>
     <div class="field">
-      <label>Type</label>
+      <label data-i18n="type">Type</label>
       <div class="type-toggle">
-        <button class="type-btn active" id="incomeBtn" onclick="setType('income')">↑ Income</button>
-        <button class="type-btn" id="expenseBtn" onclick="setType('expense')">↓ Expense</button>
+        <button class="type-btn active" id="incomeBtn" onclick="setType('income')" data-i18n="income">↑ Income</button>
+        <button class="type-btn" id="expenseBtn" onclick="setType('expense')" data-i18n="expense">↓ Expense</button>
       </div>
     </div>
     <input type="hidden" id="txType" value="income">
+    <input type="hidden" id="editIdx" value="">
     <div class="modal-actions">
-      <button class="btn danger" onclick="closeAdd()">Cancel</button>
-      <button class="btn primary" onclick="addTransaction()">Add</button>
+      <button class="btn danger" onclick="closeAdd()" data-i18n="cancel">Cancel</button>
+      <button class="btn primary" id="addBtn" onclick="addTransaction()" data-i18n="add">Add</button>
     </div>
   </div>
 </div>
@@ -136,25 +188,30 @@
 <div id="transactionsFull" class="modal full-modal">
   <div class="modal-content full-modal-content">
     <div class="modal-header">
-      <h3>All Transactions</h3>
+      <h3 data-i18n="allTx">All Transactions</h3>
       <div class="modal-header-actions">
-        <button class="btn sm-btn danger-outline" onclick="confirmClearAll()">🗑 Clear All</button>
+        <button class="btn sm-btn danger-outline" onclick="confirmClearAll()">🗑 <span data-i18n="clearAll">Clear All</span></button>
         <button class="modal-close" onclick="closeTransactionsFull()">✕</button>
       </div>
     </div>
+    <!-- Search bar -->
+    <div class="search-bar-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="txSearch" placeholder="Search transactions…" oninput="renderFullTransactions()" data-i18n-placeholder="searchTx">
+    </div>
     <div class="sort-bar">
-      <span class="sort-label">Sort:</span>
-      <button class="sort-btn" id="sb-name" onclick="toggleSort('name')">Name <span id="sarr-name" class="sort-arrow"></span></button>
-      <button class="sort-btn" id="sb-amount" onclick="toggleSort('amount')">Amount <span id="sarr-amount" class="sort-arrow"></span></button>
-      <button class="sort-btn active-sort" id="sb-date" onclick="toggleSort('date')">Date <span id="sarr-date" class="sort-arrow">▼</span></button>
-      <button class="sort-btn" id="sb-category" onclick="toggleSort('category')">Category <span id="sarr-category" class="sort-arrow"></span></button>
+      <span class="sort-label" data-i18n="sort">Sort:</span>
+      <button class="sort-btn" id="sb-name" onclick="toggleSort('name')" data-i18n="sortName">Name <span id="sarr-name" class="sort-arrow"></span></button>
+      <button class="sort-btn" id="sb-amount" onclick="toggleSort('amount')" data-i18n="sortAmount">Amount <span id="sarr-amount" class="sort-arrow"></span></button>
+      <button class="sort-btn active-sort" id="sb-date" onclick="toggleSort('date')" data-i18n="sortDate">Date <span id="sarr-date" class="sort-arrow">▼</span></button>
+      <button class="sort-btn" id="sb-category" onclick="toggleSort('category')" data-i18n="sortCat">Category <span id="sarr-category" class="sort-arrow"></span></button>
       <div class="dropdown three-dot-dd">
         <button class="sort-btn three-dot" title="Filter">⋮</button>
         <div class="dropdown-content filter-panel">
-          <div class="filter-section-title">Type</div>
-          <label class="filter-opt"><input type="checkbox" id="fltIncome" onchange="applyFilters()"> Income</label>
-          <label class="filter-opt"><input type="checkbox" id="fltExpense" onchange="applyFilters()"> Expense</label>
-          <div class="filter-section-title">Category</div>
+          <div class="filter-section-title" data-i18n="type">Type</div>
+          <label class="filter-opt"><input type="checkbox" id="fltIncome" onchange="applyFilters()"> <span data-i18n="income">Income</span></label>
+          <label class="filter-opt"><input type="checkbox" id="fltExpense" onchange="applyFilters()"> <span data-i18n="expense">Expense</span></label>
+          <div class="filter-section-title" data-i18n="category">Category</div>
           <label class="filter-opt"><input type="checkbox" class="cat-filter" value="General" onchange="applyFilters()"> 📋 General</label>
           <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Food" onchange="applyFilters()"> 🍔 Food</label>
           <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Transport" onchange="applyFilters()"> 🚌 Transport</label>
@@ -162,36 +219,36 @@
           <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Shopping" onchange="applyFilters()"> 🛍 Shopping</label>
           <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Salary" onchange="applyFilters()"> 💼 Salary</label>
           <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Other" onchange="applyFilters()"> 📦 Other</label>
-          <button class="btn sm-btn" style="margin-top:8px;width:100%" onclick="clearFilters()">Clear Filters</button>
+          <button class="btn sm-btn" style="margin-top:8px;width:100%" onclick="clearFilters()" data-i18n="clearFilters">Clear Filters</button>
         </div>
       </div>
     </div>
     <div id="fullContent" class="full-tx-list"></div>
-    <div id="fullEmpty" class="empty-state" style="display:none">No transactions match your filters.</div>
+    <div id="fullEmpty" class="empty-state" style="display:none" data-i18n="noMatch">No transactions match your filters.</div>
   </div>
 </div>
 
 <!-- ═══ SETTINGS ═══ -->
 <div id="settingsMenu" class="modal">
   <div class="modal-content settings-content">
-    <div class="modal-header"><h3>⚙ Settings</h3><button class="modal-close" onclick="closeSettings()">✕</button></div>
+    <div class="modal-header"><h3>⚙ <span data-i18n="settings">Settings</span></h3><button class="modal-close" onclick="closeSettings()">✕</button></div>
     <div class="settings-body">
 
       <div class="settings-section">
-        <div class="settings-section-title">General</div>
+        <div class="settings-section-title" data-i18n="general">General</div>
         <div class="setting-row">
-          <div><div class="setting-name">Confirm Delete</div><div class="setting-desc">Ask before deleting a transaction</div></div>
+          <div><div class="setting-name" data-i18n="confirmDelete">Confirm Delete</div><div class="setting-desc" data-i18n="confirmDeleteDesc">Ask before deleting a transaction</div></div>
           <label class="toggle-switch"><input type="checkbox" id="stgConfirmDelete" checked onchange="saveSetting('confirmDelete',this.checked)"><span class="toggle-slider"></span></label>
         </div>
         <div class="setting-row">
-          <div><div class="setting-name">Timestamp Format</div><div class="setting-desc">Shown on each transaction</div></div>
+          <div><div class="setting-name" data-i18n="tsFormat">Timestamp Format</div><div class="setting-desc" data-i18n="tsFormatDesc">Shown on each transaction</div></div>
           <select class="setting-select" id="stgTsFormat" onchange="saveSetting('tsFormat',this.value);renderTransactions()">
-            <option value="datetime">Date &amp; Time</option>
-            <option value="date">Date Only</option>
+            <option value="datetime" data-i18n="dateTime">Date &amp; Time</option>
+            <option value="date" data-i18n="dateOnly">Date Only</option>
           </select>
         </div>
         <div class="setting-row">
-          <div><div class="setting-name">Recent Transactions Shown</div><div class="setting-desc">Visible on main screen (5–20)</div></div>
+          <div><div class="setting-name" data-i18n="maxShown">Recent Transactions Shown</div><div class="setting-desc" data-i18n="maxShownDesc">Visible on main screen (5–20)</div></div>
           <div class="range-with-val">
             <input type="range" id="stgMaxShown" class="range-input" min="5" max="20" value="5"
               oninput="document.getElementById('maxShownVal').textContent=this.value;saveSetting('maxShown',+this.value);renderTransactions()">
@@ -199,19 +256,30 @@
           </div>
         </div>
         <div class="setting-row">
-          <div><div class="setting-name">Liquid Glass UI</div><div class="setting-desc">Frosted glass aesthetic</div></div>
+          <div><div class="setting-name" data-i18n="liquidGlass">Liquid Glass UI</div><div class="setting-desc" data-i18n="liquidGlassDesc">Frosted glass aesthetic</div></div>
           <label class="toggle-switch"><input type="checkbox" id="stgLiquidGlass" onchange="toggleLiquidGlass(this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-name" data-i18n="language">Language</div><div class="setting-desc" data-i18n="languageDesc">App interface language</div></div>
+          <select class="setting-select" id="stgLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">🇬🇧 English</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="fa">🇮🇷 فارسی</option>
+          </select>
         </div>
       </div>
 
       <div class="settings-section">
-        <div class="settings-section-title">Music</div>
+        <div class="settings-section-title" data-i18n="music">Music</div>
         <div class="music-widget">
           <div class="music-thumb-row">
             <div class="music-thumb" id="musicThumb" onclick="toggleMusicPanel()" title="Click to expand">♪</div>
             <div>
-              <div class="setting-name">Ambiance Player</div>
-              <div class="setting-desc">Click icon to expand controls</div>
+              <div class="setting-name" data-i18n="ambiancePlayer">Ambiance Player</div>
+              <div class="setting-desc" data-i18n="ambiancePlayerDesc">Click icon to expand controls</div>
             </div>
             <label class="toggle-switch" style="margin-left:auto">
               <input type="checkbox" id="stgMusicOn" onchange="toggleMusic(this.checked)"><span class="toggle-slider"></span>
@@ -242,16 +310,16 @@
           </div>
         </div>
         <div class="song-list" id="songList"></div>
-        <button class="btn sm-btn primary" style="margin-top:10px;width:100%" onclick="openAddSong()">+ Add Your Own Song</button>
+        <button class="btn sm-btn primary" style="margin-top:10px;width:100%" onclick="openAddSong()" data-i18n="addSong">+ Add Your Own Song</button>
       </div>
 
       <div class="settings-section">
-        <div class="settings-section-title">Data</div>
+        <div class="settings-section-title" data-i18n="data">Data</div>
         <div class="data-btns">
-          <button class="btn primary" onclick="exportData()">⬆ Export Data</button>
-          <label class="btn" style="cursor:pointer;text-align:center">⬇ Import Data<input type="file" id="importFile" accept=".json" onchange="importData(this)" style="display:none"></label>
+          <button class="btn primary" onclick="exportData()" data-i18n="exportData">⬆ Export Data</button>
+          <label class="btn" style="cursor:pointer;text-align:center"><span data-i18n="importData">⬇ Import Data</span><input type="file" id="importFile" accept=".json" onchange="importData(this)" style="display:none"></label>
         </div>
-        <div class="setting-desc" style="margin-top:8px;line-height:1.5">
+        <div class="setting-desc" style="margin-top:8px;line-height:1.5" data-i18n="dataDesc">
           Exports all transactions, balance, settings &amp; preferences as a .json file. Custom audio files are not included. Data is also saved automatically in your browser (localStorage).
         </div>
       </div>
@@ -263,11 +331,11 @@
 <!-- ═══ CONFIRM DELETE ═══ -->
 <div id="confirmDeleteModal" class="modal mini-modal">
   <div class="modal-content mini-content">
-    <div class="modal-header"><h3>Delete Transaction?</h3></div>
-    <p class="confirm-text" id="confirmDeleteText">Are you sure you want to delete this transaction?</p>
+    <div class="modal-header"><h3 data-i18n="deleteTx">Delete Transaction?</h3></div>
+    <p class="confirm-text" id="confirmDeleteText"></p>
     <div class="modal-actions">
-      <button class="btn" onclick="closeConfirmDelete()">Cancel</button>
-      <button class="btn danger" onclick="executeDelete()">Delete</button>
+      <button class="btn" onclick="closeConfirmDelete()" data-i18n="cancel">Cancel</button>
+      <button class="btn danger" onclick="executeDelete()" data-i18n="delete">Delete</button>
     </div>
   </div>
 </div>
@@ -275,24 +343,102 @@
 <!-- ═══ CONFIRM CLEAR ALL ═══ -->
 <div id="confirmClearModal" class="modal mini-modal">
   <div class="modal-content mini-content">
-    <div class="modal-header"><h3>⚠ Clear All?</h3></div>
-    <p class="confirm-text">This will permanently delete <strong>all</strong> transactions and reset your balance to zero. This cannot be undone.</p>
+    <div class="modal-header"><h3>⚠ <span data-i18n="clearAll">Clear All?</span></h3></div>
+    <p class="confirm-text" data-i18n="clearAllConfirm">This will permanently delete <strong>all</strong> transactions and reset your balance to zero. This cannot be undone.</p>
     <div class="modal-actions">
-      <button class="btn" onclick="document.getElementById('confirmClearModal').style.display='none'">Cancel</button>
-      <button class="btn danger" onclick="clearAllTransactions()">Yes, Clear All</button>
+      <button class="btn" onclick="document.getElementById('confirmClearModal').style.display='none'" data-i18n="cancel">Cancel</button>
+      <button class="btn danger" onclick="clearAllTransactions()" data-i18n="yesDelete">Yes, Clear All</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ CURRENCY CONVERT ═══ -->
+<!-- ═══ CURRENCY CONVERT MODAL ═══ -->
 <div id="currencyConvertModal" class="modal mini-modal">
   <div class="modal-content mini-content">
-    <div class="modal-header"><h3>Currency Change</h3></div>
+    <div class="modal-header"><h3 data-i18n="currencyChange">Currency Change</h3></div>
     <p class="confirm-text" id="convertText"></p>
     <div class="rate-info" id="rateInfo"></div>
     <div class="modal-actions">
-      <button class="btn" onclick="applyCurrencyChange(false)">Keep Values</button>
-      <button class="btn primary" id="convertBtn" onclick="applyCurrencyChange(true)">Convert</button>
+      <button class="btn" onclick="applyCurrencyChange(false)" data-i18n="keepValues">Keep Values</button>
+      <button class="btn primary" id="convertBtn" onclick="applyCurrencyChange(true)" data-i18n="convert">Convert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CURRENCY CONVERTER TOOL ═══ -->
+<div id="converterModal" class="modal">
+  <div class="modal-content converter-content">
+    <div class="modal-header">
+      <h3>⇄ <span data-i18n="currencyConverter">Currency Converter</span></h3>
+      <button class="modal-close" onclick="closeConverter()">✕</button>
+    </div>
+    <div class="converter-body">
+      <div class="converter-row">
+        <div class="converter-field">
+          <label data-i18n="amount">Amount</label>
+          <input type="number" id="convAmount" placeholder="100" value="1" oninput="runConvert()">
+        </div>
+        <div class="converter-field">
+          <label data-i18n="from">From</label>
+          <select id="convFrom" onchange="runConvert()">
+            <option value="USD">🇺🇸 USD</option>
+            <option value="EUR">🇪🇺 EUR</option>
+            <option value="GBP">🇬🇧 GBP</option>
+            <option value="TRY">🇹🇷 TRY</option>
+            <option value="JPY">🇯🇵 JPY</option>
+            <option value="INR">🇮🇳 INR</option>
+            <option value="CAD">🇨🇦 CAD</option>
+            <option value="AUD">🇦🇺 AUD</option>
+            <option value="CHF">🇨🇭 CHF</option>
+            <option value="CNY">🇨🇳 CNY</option>
+            <option value="BRL">🇧🇷 BRL</option>
+            <option value="MXN">🇲🇽 MXN</option>
+            <option value="KRW">🇰🇷 KRW</option>
+            <option value="RUB">🇷🇺 RUB</option>
+            <option value="SEK">🇸🇪 SEK</option>
+            <option value="NOK">🇳🇴 NOK</option>
+            <option value="DKK">🇩🇰 DKK</option>
+            <option value="PLN">🇵🇱 PLN</option>
+            <option value="SGD">🇸🇬 SGD</option>
+            <option value="HKD">🇭🇰 HKD</option>
+          </select>
+        </div>
+        <button class="swap-btn" onclick="swapConv()" title="Swap currencies">⇄</button>
+        <div class="converter-field">
+          <label data-i18n="to">To</label>
+          <select id="convTo" onchange="runConvert()">
+            <option value="USD">🇺🇸 USD</option>
+            <option value="EUR" selected>🇪🇺 EUR</option>
+            <option value="GBP">🇬🇧 GBP</option>
+            <option value="TRY">🇹🇷 TRY</option>
+            <option value="JPY">🇯🇵 JPY</option>
+            <option value="INR">🇮🇳 INR</option>
+            <option value="CAD">🇨🇦 CAD</option>
+            <option value="AUD">🇦🇺 AUD</option>
+            <option value="CHF">🇨🇭 CHF</option>
+            <option value="CNY">🇨🇳 CNY</option>
+            <option value="BRL">🇧🇷 BRL</option>
+            <option value="MXN">🇲🇽 MXN</option>
+            <option value="KRW">🇰🇷 KRW</option>
+            <option value="RUB">🇷🇺 RUB</option>
+            <option value="SEK">🇸🇪 SEK</option>
+            <option value="NOK">🇳🇴 NOK</option>
+            <option value="DKK">🇩🇰 DKK</option>
+            <option value="PLN">🇵🇱 PLN</option>
+            <option value="SGD">🇸🇬 SGD</option>
+            <option value="HKD">🇭🇰 HKD</option>
+          </select>
+        </div>
+      </div>
+      <div class="converter-result" id="convResult">
+        <div class="conv-number" id="convResultNum">—</div>
+        <div class="conv-rate" id="convResultRate"></div>
+        <div class="conv-updated" id="convUpdated"></div>
+      </div>
+      <div class="quick-pairs">
+        <div class="quick-pairs-title" data-i18n="popularPairs">Popular Pairs</div>
+        <div class="quick-pairs-grid" id="quickPairs"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -300,7 +446,7 @@
 <!-- ═══ ADD SONG ═══ -->
 <div id="addSongModal" class="modal mini-modal">
   <div class="modal-content">
-    <div class="modal-header"><h3>Add Custom Song</h3><button class="modal-close" onclick="closeAddSong()">✕</button></div>
+    <div class="modal-header"><h3 data-i18n="addSong">Add Custom Song</h3><button class="modal-close" onclick="closeAddSong()">✕</button></div>
     <div class="field">
       <label>Audio File</label>
       <label class="file-input-label">

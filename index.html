@@ -14,7 +14,7 @@
 <div id="loader">
   <canvas id="starfield"></canvas>
   <div class="loader-content">
-    <div class="loader-title">PROJECT ATLAS <br> (BETA)</div>
+    <div class="loader-title">PROJECT ATLAS</div>
     <div class="loader-subtitle">Budget Control System</div>
     <div class="loader-bar-wrap"><div class="loader-bar-fill" id="loaderFill"></div></div>
     <div class="loader-pct" id="loaderPct">0%</div>
@@ -43,7 +43,7 @@
 <!-- APP -->
 <div id="app">
   <header>
-    <div class="logo"><span class="logo-icon">◈</span><span class="logo-text shimmer-text">PROJECT ATLAS V2.8.6 (BETA)</span></div>
+    <div class="logo"><span class="logo-icon">◈</span><span class="logo-text shimmer-text">PROJECT ATLAS V3</span></div>
     <div class="header-controls">
       <div class="dropdown">
         <button class="btn hdr-btn"><span id="currencyLabel">USD $</span> ▾</button>
@@ -125,6 +125,19 @@
       </div>
     </div>
 
+    <!-- PREDEFINED TRANSACTIONS -->
+    <div class="card" id="predefinedCard">
+      <div class="transactions-header">
+        <h3>⚡ QUICK TRANSACTIONS</h3>
+        <span class="predefined-count" id="predefinedCount"></span>
+      </div>
+      <div id="predefinedGrid" class="predefined-grid"></div>
+      <div id="predefinedEmpty" class="empty-state" style="display:none">
+        <div class="empty-illustration">⚡</div>
+        <span>No quick transactions yet. Mark a transaction as predefined when adding.</span>
+      </div>
+    </div>
+
     <!-- RECENT TRANSACTIONS -->
     <div class="card" id="txPreviewCard">
       <div class="transactions-header">
@@ -137,6 +150,15 @@
         <span data-i18n="noTx">No transactions yet. Tap <b>+</b> to add one.</span>
       </div>
     </div>
+  </div>
+
+  <!-- ABOUT SECTION -->
+  <div id="aboutSection" class="about-section">
+    <div class="about-line"><span class="about-label">PROJECT</span> <span class="about-highlight">ATLAS V3.0</span></div>
+    <div class="about-line"><span class="about-label">Author</span> <span class="about-author">Sam Roohi</span></div>
+    <div class="about-line"><span class="about-label">Hosted on</span> <span class="about-muted">Cloudflare Servers</span></div>
+    <div class="about-line"><span class="about-label">Candidate for</span> <span class="about-highlight">1W1I</span></div>
+    <div class="about-line"><span class="about-label">Directed by</span> <span class="about-highlight">AIOLEARN</span> <span class="about-muted">Academy</span></div>
   </div>
 
   <!-- FAB GROUP -->
@@ -157,17 +179,19 @@
     <div class="field"><label data-i18n="amount">Amount</label><input id="txAmount" type="number" placeholder="0.00" min="0" step="0.01"></div>
     <div class="field">
       <label data-i18n="category">Category</label>
-      <select id="txCategory">
-        <option value="General">📋 General</option>
-        <option value="Food">🍔 Food</option>
-        <option value="Transport">🚌 Transport</option>
-        <option value="Bills">💡 Bills</option>
-        <option value="Shopping">🛍 Shopping</option>
-        <option value="Salary">💼 Salary</option>
-        <option value="Other">📦 Other</option>
-      </select>
+      <div class="category-row">
+        <select id="txCategory"></select>
+        <button type="button" class="btn sm-btn" onclick="openAddCustomCategory()" title="Add custom category" style="flex-shrink:0;padding:8px 10px;">+</button>
+      </div>
     </div>
     <div class="field"><label data-i18n="note">Note <span class="opt-label">(optional)</span></label><textarea id="txNote" placeholder="Add a note…" rows="2"></textarea></div>
+    <div class="field predefined-field">
+      <label class="predefined-check-label">
+        <input type="checkbox" id="txPredefined">
+        <span class="predefined-check-text">⚡ Save as Quick Transaction</span>
+      </label>
+      <div class="setting-desc" style="margin-top:4px;padding-left:22px">Adds this to your Quick Transactions panel for fast reuse</div>
+    </div>
     <div class="field">
       <label data-i18n="type">Type</label>
       <div class="type-toggle">
@@ -196,8 +220,8 @@
     </div>
     <!-- Search bar -->
     <div class="search-bar-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="txSearch" placeholder="Search transactions…" oninput="renderFullTransactions()" data-i18n-placeholder="searchTx">
+      <span class="search-icon-outer">🔍</span>
+      <input type="text" id="txSearch" placeholder="Search transactions…" oninput="renderFullTransactions()" data-i18n-placeholder="searchTx" >
     </div>
     <div class="sort-bar">
       <span class="sort-label" data-i18n="sort">Sort:</span>
@@ -212,13 +236,7 @@
           <label class="filter-opt"><input type="checkbox" id="fltIncome" onchange="applyFilters()"> <span data-i18n="income">Income</span></label>
           <label class="filter-opt"><input type="checkbox" id="fltExpense" onchange="applyFilters()"> <span data-i18n="expense">Expense</span></label>
           <div class="filter-section-title" data-i18n="category">Category</div>
-          <label class="filter-opt"><input type="checkbox" class="cat-filter" value="General" onchange="applyFilters()"> 📋 General</label>
-          <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Food" onchange="applyFilters()"> 🍔 Food</label>
-          <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Transport" onchange="applyFilters()"> 🚌 Transport</label>
-          <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Bills" onchange="applyFilters()"> 💡 Bills</label>
-          <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Shopping" onchange="applyFilters()"> 🛍 Shopping</label>
-          <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Salary" onchange="applyFilters()"> 💼 Salary</label>
-          <label class="filter-opt"><input type="checkbox" class="cat-filter" value="Other" onchange="applyFilters()"> 📦 Other</label>
+          <div id="catFilterList"></div>
           <button class="btn sm-btn" style="margin-top:8px;width:100%" onclick="clearFilters()" data-i18n="clearFilters">Clear Filters</button>
         </div>
       </div>
@@ -270,6 +288,25 @@
             <option value="fa">🇮🇷 فارسی</option>
           </select>
         </div>
+        <div class="setting-row">
+          <div><div class="setting-name">🌌 Galaxy Mode</div><div class="setting-desc">Experimental: nebula & deep-space effects in dark mode</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="stgGalaxy" onchange="toggleGalaxyMode(this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <!-- CUSTOM CATEGORIES -->
+      <div class="settings-section">
+        <div class="settings-section-title">📋 Custom Categories</div>
+        <div id="customCatList" class="custom-cat-list"></div>
+        <button class="btn sm-btn primary" style="margin-top:10px;width:100%" onclick="openAddCustomCategory()">+ Add Custom Category</button>
+      </div>
+
+      <!-- QUICK TRANSACTIONS MANAGEMENT -->
+      <div class="settings-section">
+        <div class="settings-section-title">⚡ Quick Transactions</div>
+        <div class="setting-desc" style="margin-bottom:12px">Manage your saved quick transactions (max <span id="maxPredefinedLabel">16</span>)</div>
+        <div id="predefinedMgmtList" class="predefined-mgmt-list"></div>
+        <div id="predefinedMgmtEmpty" class="setting-desc" style="display:none;padding:8px 0">No quick transactions saved yet.</div>
       </div>
 
       <div class="settings-section">
@@ -469,6 +506,26 @@
     <div class="modal-actions">
       <button class="btn danger" onclick="closeAddSong()">Cancel</button>
       <button class="btn primary" onclick="addCustomSong()">Add Song</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD CUSTOM CATEGORY ═══ -->
+<div id="addCustomCategoryModal" class="modal mini-modal">
+  <div class="modal-content mini-content">
+    <div class="modal-header"><h3>📋 Add Custom Category</h3><button class="modal-close" onclick="closeAddCustomCategory()">✕</button></div>
+    <div class="field">
+      <label>Emoji Icon</label>
+      <input id="newCatEmoji" placeholder="e.g. 🎮" maxlength="4" style="width:90px;display:inline-block;margin-right:8px">
+      <span style="font-size:0.75rem;color:var(--muted)">Pick an emoji for this category</span>
+    </div>
+    <div class="field">
+      <label>Category Name</label>
+      <input id="newCatName" placeholder="e.g. Gaming">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddCustomCategory()">Cancel</button>
+      <button class="btn primary" onclick="addCustomCategory()">Add Category</button>
     </div>
   </div>
 </div>

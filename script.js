@@ -252,6 +252,25 @@ let songs = [
   { title:'Event Horizon',   artist:'Project Atlas', src:'music/event_horizon.mp3',   custom:false, enabled:true, trimStart:0, trimEnd:null },
 ];
 
+/* ── Custom categories ──────────────────────────────────── */
+// Easily change max predefined transactions here:
+const MAX_PREDEFINED = 16;
+
+const DEFAULT_CATEGORIES = [
+  { name:'General',   emoji:'📋' },
+  { name:'Food',      emoji:'🍔' },
+  { name:'Transport', emoji:'🚌' },
+  { name:'Bills',     emoji:'💡' },
+  { name:'Shopping',  emoji:'🛍' },
+  { name:'Salary',    emoji:'💼' },
+  { name:'Other',     emoji:'📦' },
+];
+let customCategories = []; // {name, emoji} — user-added
+let predefinedTransactions = []; // {name, amount, type, category, note} up to MAX_PREDEFINED
+let galaxyMode = false;
+let galaxyCanvas = null;
+let galaxyAnimId = null;
+
 /* Sort/filter state */
 let sortField = 'date';
 let sortDir   = 'desc';
@@ -292,6 +311,9 @@ function loadData() {
     if (d.settings)      settings       = Object.assign(settings, d.settings);
     if (d.songs)         songs          = d.songs.map((s,i) => Object.assign({}, songs[i] || {}, s));
     if (d.goal)          { const g = $('goal'); if(g) g.value = d.goal; }
+    if (d.customCategories) customCategories = d.customCategories;
+    if (d.predefinedTransactions) predefinedTransactions = d.predefinedTransactions;
+    if (d.galaxyMode !== undefined) galaxyMode = d.galaxyMode;
     currentLang = settings.language || 'en';
   } catch(e) { console.warn('loadData:', e); }
 }
@@ -303,6 +325,7 @@ function saveData() {
       accentColor, settings,
       songs: songs.map(s => ({ title:s.title, artist:s.artist, src: s.custom ? s.src : '', custom:s.custom, enabled:s.enabled, trimStart:s.trimStart||0, trimEnd:s.trimEnd||null })),
       goal: $('goal') ? $('goal').value : '',
+      customCategories, predefinedTransactions, galaxyMode,
     }));
   } catch(e) { console.warn('saveData:', e); }
 }
@@ -331,7 +354,11 @@ function applySettings() {
   if (player) player.volume      = settings.volume;
   setLoopModeUI(settings.loopMode);
   $('currencyLabel').textContent = currencyLabel;
+  if ($('stgGalaxy')) $('stgGalaxy').checked = galaxyMode;
+  if ($('maxPredefinedLabel')) $('maxPredefinedLabel').textContent = MAX_PREDEFINED;
   applyTranslations();
+  populateCategorySelects();
+  if (galaxyMode && settings.darkMode) startGalaxyMode(); else stopGalaxyMode();
 }
 
 /* ── Rolling Number Animation ─────────────────────────── */
@@ -568,6 +595,7 @@ function updateUI() {
   renderTransactions();
   updateProgress();
   updateAnalytics();
+  renderPredefined();
   saveData();
   document.title = `Project Atlas — ${currency}${Math.abs(balance).toFixed(2)}`;
 }
@@ -599,9 +627,8 @@ function renderTransactions() {
 }
 
 function buildTxItem(t, realIdx, inFull) {
-  const ICONS = {General:'📋',Food:'🍔',Transport:'🚌',Bills:'💡',Shopping:'🛍',Salary:'💼',Other:'📦'};
   const sign = t.type==='income' ? '+' : '-';
-  const icon = ICONS[t.category]||'📋';
+  const icon = getCategoryIcon(t.category);
 
   let tsText = '';
   if (t.createdAt) {
@@ -708,16 +735,15 @@ function drawDonut() {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  const CATS = ['General','Food','Transport','Bills','Shopping','Salary','Other'];
-  const CAT_COLORS = ['#4ade80','#38bdf8','#f97316','#f59e0b','#a78bfa','#34d399','#fb7185'];
-
+  const BASE_COLORS = ['#4ade80','#38bdf8','#f97316','#f59e0b','#a78bfa','#34d399','#fb7185','#e879f9','#22d3ee','#fbbf24','#f472b6','#6ee7b7','#818cf8','#f87171','#34d399','#a3e635'];
+  const allCatsList = getAllCategories();
   const expenses = transactions.filter(t => t.type === 'expense');
   const byCategory = {};
-  CATS.forEach(c => byCategory[c] = 0);
+  allCatsList.forEach(c => byCategory[c.name] = 0);
   expenses.forEach(t => { byCategory[t.category] = (byCategory[t.category]||0) + t.amount; });
 
   const total = Object.values(byCategory).reduce((a,b)=>a+b,0);
-  const entries = CATS.map((c,i) => ({ label:c, value:byCategory[c], color:CAT_COLORS[i] }))
+  const entries = allCatsList.map((c,i) => ({ label:c.name, value:byCategory[c.name]||0, color:BASE_COLORS[i % BASE_COLORS.length] }))
                       .filter(e => e.value > 0);
 
   const legend = $('donutLegend');
@@ -975,6 +1001,7 @@ function addTransaction() {
   const type     = $('txType').value;
   const category = $('txCategory').value;
   const note     = $('txNote').value.trim();
+  const isPredefined = $('txPredefined') ? $('txPredefined').checked : false;
   let valid = true;
   if (!name)          { shakeEl($('txName'));   valid=false; }
   if (!amount||amount<=0) { shakeEl($('txAmount')); valid=false; }
@@ -985,9 +1012,7 @@ function addTransaction() {
   if (editing) {
     const idx = parseInt($('editIdx').value);
     const old = transactions[idx];
-    // Revert old balance effect
     if (old.type==='income') balance -= old.amount; else balance += old.amount;
-    // Apply new
     if (type==='income') balance += amount; else balance -= amount;
     transactions[idx] = { ...old, name, amount, type, category, note };
   } else {
@@ -995,7 +1020,18 @@ function addTransaction() {
     transactions.push({ name, amount, type, category, note, createdAt: new Date().toISOString() });
   }
 
+  // Save as predefined if checked
+  if (isPredefined && !editing) {
+    if (predefinedTransactions.length < MAX_PREDEFINED) {
+      // avoid duplicates by name
+      if (!predefinedTransactions.find(p => p.name === name && p.amount === amount && p.type === type)) {
+        predefinedTransactions.push({ name, amount, type, category, note });
+      }
+    }
+  }
+
   updateUI();
+  renderPredefined();
   closeAdd();
 }
 
@@ -1018,22 +1054,23 @@ function openEdit(idx) {
   if (!tx) return;
 
   editIdx = idx;
-
+  populateCategorySelects();
   $('txName').value = tx.name;
   $('txAmount').value = tx.amount;
   $('txCategory').value = tx.category || 'General';
   $('txNote').value = tx.note || '';
+  if ($('txPredefined')) $('txPredefined').checked = false;
 
   setType(tx.type);
 
   $('editIdx').value = idx;
-
-  // FIXED: use translation function t(), not transaction object
   $('addModalTitle').textContent = t('editTx');
   $('addBtn').textContent = t('save');
 
   $('addMenu').style.display = 'flex';
-
+  // Hide predefined checkbox when editing
+  const predField = document.querySelector('.predefined-field');
+  if (predField) predField.style.display = 'none';
   setTimeout(() => $('txName').focus(), 120);
 }
 
@@ -1120,6 +1157,19 @@ function openTransactionsFull() {
 function closeTransactionsFull() { $('transactionsFull').style.display='none'; }
 
 function renderFullTransactions() {
+  // Rebuild category filter list dynamically
+  const catFilterList = $('catFilterList');
+  if (catFilterList) {
+    const allCats = getAllCategories();
+    catFilterList.innerHTML = allCats.map(c =>
+      `<label class="filter-opt"><input type="checkbox" class="cat-filter" value="${escHtml(c.name)}" onchange="applyFilters()"> ${c.emoji} ${escHtml(c.name)}</label>`
+    ).join('');
+    // Restore checked state
+    catFilterList.querySelectorAll('.cat-filter').forEach(cb => {
+      cb.checked = filterCats.includes(cb.value);
+    });
+  }
+
   let list = [...transactions];
 
   // Search
@@ -1137,10 +1187,11 @@ function renderFullTransactions() {
   // Sort
   list.sort((a,b)=>{
     let av, bv;
-    if      (sortField==='name')     { av=a.name.toLowerCase(); bv=b.name.toLowerCase(); }
+    if      (sortField==='name')     { av=(a.name||'').toLowerCase(); bv=(b.name||'').toLowerCase(); }
     else if (sortField==='amount')   { av=a.amount; bv=b.amount; }
-    else if (sortField==='date')     { av=new Date(a.createdAt||0); bv=new Date(b.createdAt||0); }
-    else if (sortField==='category') { av=a.category; bv=b.category; }
+    else if (sortField==='date')     { av=new Date(a.createdAt||0).getTime(); bv=new Date(b.createdAt||0).getTime(); }
+    else if (sortField==='category') { av=(a.category||'').toLowerCase(); bv=(b.category||'').toLowerCase(); }
+    else                             { av=new Date(a.createdAt||0).getTime(); bv=new Date(b.createdAt||0).getTime(); }
     if (av<bv) return sortDir==='asc'?-1:1;
     if (av>bv) return sortDir==='asc'?1:-1;
     return 0;
@@ -1184,7 +1235,8 @@ function applyFilters() {
 
 function clearFilters() {
   filterTypes=[]; filterCats=[];
-  $('fltIncome').checked=$('fltExpense').checked=false;
+  if ($('fltIncome'))  $('fltIncome').checked=false;
+  if ($('fltExpense')) $('fltExpense').checked=false;
   document.querySelectorAll('.cat-filter').forEach(c=>c.checked=false);
   renderFullTransactions();
 }
@@ -1349,6 +1401,7 @@ function toggleMode() {
   $('modeBtn').textContent = settings.darkMode ? '🌙' : '☀️';
   saveData();
   updateAnalytics();
+  if (galaxyMode && settings.darkMode) startGalaxyMode(); else stopGalaxyMode();
 }
 
 function toggleLiquidGlass(on) {
@@ -1359,16 +1412,21 @@ function toggleLiquidGlass(on) {
 /* ── Add/Close modals ─────────────────────────────────── */
 function openAdd() {
   $('txName').value=''; $('txAmount').value=''; $('txNote').value='';
+  populateCategorySelects();
   $('txCategory').value='General'; setType('income');
   $('editIdx').value = '';
+  if ($('txPredefined')) $('txPredefined').checked = false;
   $('addModalTitle').textContent = t('newTx');
   $('addBtn').textContent = t('add');
   $('addMenu').style.display='flex';
+  // Show predefined checkbox for new transactions
+  const predField = document.querySelector('.predefined-field');
+  if (predField) predField.style.display = '';
   setTimeout(()=>$('txName').focus(),120);
 }
 function closeAdd() { $('addMenu').style.display='none'; $('editIdx').value=''; }
 
-function openSettings() { $('settingsMenu').style.display='flex'; renderSongList(); }
+function openSettings() { $('settingsMenu').style.display='flex'; renderSongList(); renderCustomCatList(); renderPredefinedMgmt(); }
 function closeSettings() { $('settingsMenu').style.display='none'; }
 
 /* Close modal on backdrop click */
@@ -1615,11 +1673,12 @@ function addCustomSong() {
 /* ── Export / Import ──────────────────────────────────── */
 function exportData() {
   const payload = JSON.stringify({
-    version:2, exportedAt: new Date().toISOString(),
+    version:3, exportedAt: new Date().toISOString(),
     transactions, balance, currency, currencyCode, currencyLabel,
     accentColor, settings,
     goal: $('goal')?.value||'',
     songs: songs.map(s=>({ title:s.title, artist:s.artist, custom:s.custom, enabled:s.enabled, trimStart:s.trimStart||0, trimEnd:s.trimEnd||null })),
+    customCategories, predefinedTransactions, galaxyMode,
   }, null, 2);
   const blob = new Blob([payload], {type:'application/json'});
   const url  = URL.createObjectURL(blob);
@@ -1643,8 +1702,11 @@ function importData(input) {
       if (d.settings)      settings = Object.assign(settings, d.settings);
       if (d.goal && $('goal')) $('goal').value=d.goal;
       if (d.songs) d.songs.forEach((s,i)=>{ if(songs[i]) Object.assign(songs[i],{title:s.title,artist:s.artist,enabled:s.enabled,trimStart:s.trimStart,trimEnd:s.trimEnd}); });
+      if (d.customCategories) customCategories = d.customCategories;
+      if (d.predefinedTransactions) predefinedTransactions = d.predefinedTransactions;
+      if (d.galaxyMode !== undefined) galaxyMode = d.galaxyMode;
       currentLang = settings.language || 'en';
-      applySettings(); updateUI(); renderSongList();
+      applySettings(); updateUI(); renderSongList(); renderPredefined();
       alert('✅ Data imported successfully!');
     } catch(err) {
       alert('❌ Import failed: invalid file format.');
@@ -1654,6 +1716,298 @@ function importData(input) {
   reader.readAsText(f);
 }
 
+/* ── Categories ───────────────────────────────────────── */
+function getAllCategories() {
+  return [...DEFAULT_CATEGORIES, ...customCategories];
+}
+
+function getCategoryIcon(name) {
+  const all = getAllCategories();
+  const found = all.find(c => c.name === name);
+  return found ? found.emoji : '📋';
+}
+
+function populateCategorySelects() {
+  const allCats = getAllCategories();
+  const selects = document.querySelectorAll('#txCategory');
+  selects.forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = allCats.map(c =>
+      `<option value="${escHtml(c.name)}">${c.emoji} ${escHtml(c.name)}</option>`
+    ).join('');
+    if (cur && allCats.find(c => c.name === cur)) sel.value = cur;
+  });
+}
+
+function renderCustomCatList() {
+  const list = $('customCatList');
+  if (!list) return;
+  if (!customCategories.length) {
+    list.innerHTML = '<div class="setting-desc" style="padding:6px 0">No custom categories yet.</div>';
+    return;
+  }
+  list.innerHTML = customCategories.map((c, i) => `
+    <div class="predefined-mgmt-item">
+      <span class="predefined-mgmt-icon">${c.emoji}</span>
+      <span class="predefined-mgmt-name">${escHtml(c.name)}</span>
+      <button class="song-del-btn" onclick="deleteCustomCategory(${i})" title="Delete">✕</button>
+    </div>
+  `).join('');
+}
+
+function openAddCustomCategory() {
+  if ($('newCatEmoji')) $('newCatEmoji').value = '';
+  if ($('newCatName'))  $('newCatName').value  = '';
+  $('addCustomCategoryModal').style.display = 'flex';
+}
+
+function closeAddCustomCategory() {
+  $('addCustomCategoryModal').style.display = 'none';
+}
+
+function addCustomCategory() {
+  const emoji = ($('newCatEmoji')?.value.trim()) || '🏷';
+  const name  = $('newCatName')?.value.trim();
+  if (!name) { shakeEl($('newCatName')); return; }
+  if (getAllCategories().find(c => c.name.toLowerCase() === name.toLowerCase())) {
+    shakeEl($('newCatName')); return;
+  }
+  customCategories.push({ name, emoji });
+  saveData();
+  populateCategorySelects();
+  renderCustomCatList();
+  closeAddCustomCategory();
+}
+
+function deleteCustomCategory(idx) {
+  customCategories.splice(idx, 1);
+  saveData();
+  populateCategorySelects();
+  renderCustomCatList();
+}
+
+/* ── Predefined Transactions ──────────────────────────── */
+function renderPredefined() {
+  const grid  = $('predefinedGrid');
+  const empty = $('predefinedEmpty');
+  if (!grid) return;
+  const count = $('predefinedCount');
+  if (count) count.textContent = predefinedTransactions.length ? `${predefinedTransactions.length}/${MAX_PREDEFINED}` : '';
+
+  if (!predefinedTransactions.length) {
+    grid.innerHTML = '';
+    if (empty) empty.style.display = 'flex';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  grid.innerHTML = predefinedTransactions.map((p, i) => `
+    <button class="predefined-tile ${p.type}" onclick="applyPredefined(${i})" title="${escHtml(p.name)}">
+      <span class="predefined-tile-icon">${getCategoryIcon(p.category)}</span>
+      <span class="predefined-tile-name">${escHtml(p.name)}</span>
+      <span class="predefined-tile-amount">${p.type==='income'?'+':'-'}${currency}${parseFloat(p.amount).toFixed(2)}</span>
+    </button>
+  `).join('');
+}
+
+function applyPredefined(idx) {
+  const p = predefinedTransactions[idx];
+  if (!p) return;
+  populateCategorySelects();
+  $('txName').value   = p.name;
+  $('txAmount').value = p.amount;
+  $('txNote').value   = p.note || '';
+  $('txCategory').value = p.category || 'General';
+  setType(p.type);
+  $('editIdx').value  = '';
+  if ($('txPredefined')) $('txPredefined').checked = false;
+  $('addModalTitle').textContent = t('newTx');
+  $('addBtn').textContent = t('add');
+  $('addMenu').style.display = 'flex';
+  setTimeout(() => $('txName').focus(), 120);
+}
+
+function renderPredefinedMgmt() {
+  const list  = $('predefinedMgmtList');
+  const empty = $('predefinedMgmtEmpty');
+  if (!list) return;
+  if (!predefinedTransactions.length) {
+    list.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  list.innerHTML = predefinedTransactions.map((p, i) => `
+    <div class="predefined-mgmt-item">
+      <span class="predefined-mgmt-icon">${getCategoryIcon(p.category)}</span>
+      <div class="predefined-mgmt-info">
+        <span class="predefined-mgmt-name">${escHtml(p.name)}</span>
+        <span class="predefined-mgmt-meta ${p.type}">${p.type==='income'?'+':'-'}${currency}${parseFloat(p.amount).toFixed(2)} · ${escHtml(p.category)}</span>
+      </div>
+      <button class="song-del-btn" onclick="deletePredefined(${i})" title="Remove">✕</button>
+    </div>
+  `).join('');
+}
+
+function deletePredefined(idx) {
+  predefinedTransactions.splice(idx, 1);
+  saveData();
+  renderPredefined();
+  renderPredefinedMgmt();
+}
+
+/* ── Galaxy Mode ──────────────────────────────────────── */
+function toggleGalaxyMode(on) {
+  galaxyMode = on;
+  saveData();
+  if (on && settings.darkMode) startGalaxyMode(); else stopGalaxyMode();
+}
+
+function startGalaxyMode() {
+  if (galaxyCanvas) return; // already running
+  galaxyCanvas = document.createElement('canvas');
+  galaxyCanvas.id = 'galaxyCanvas';
+  galaxyCanvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.5s ease;';
+  document.body.insertBefore(galaxyCanvas, document.body.firstChild);
+  requestAnimationFrame(() => { galaxyCanvas.style.opacity = '1'; });
+  runGalaxy();
+}
+
+function stopGalaxyMode() {
+  if (!galaxyCanvas) return;
+  galaxyCanvas.style.opacity = '0';
+  setTimeout(() => {
+    if (galaxyCanvas && galaxyCanvas.parentNode) galaxyCanvas.parentNode.removeChild(galaxyCanvas);
+    galaxyCanvas = null;
+    if (galaxyAnimId) { cancelAnimationFrame(galaxyAnimId); galaxyAnimId = null; }
+  }, 1600);
+}
+
+function runGalaxy() {
+  const canvas = galaxyCanvas;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  resize(); addEventListener('resize', resize);
+
+  // Nebulae layers
+  const nebulae = Array.from({length: 6}, (_, i) => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 350 + 180,
+    hue: [260, 200, 300, 180, 340, 230][i],
+    sat: Math.random() * 40 + 40,
+    opa: Math.random() * 0.12 + 0.04,
+    dx: (Math.random() - 0.5) * 0.15,
+    dy: (Math.random() - 0.5) * 0.1,
+    pulse: Math.random() * Math.PI * 2,
+    pulseSpeed: Math.random() * 0.008 + 0.003,
+  }));
+
+  // Star clusters
+  const stars = Array.from({length: 400}, () => ({
+    x: Math.random() * 2000,
+    y: Math.random() * 2000,
+    r: Math.random() * 1.8 + 0.1,
+    a: Math.random() * 0.8 + 0.1,
+    twinkle: Math.random() * Math.PI * 2,
+    twinkleSpeed: Math.random() * 0.04 + 0.01,
+    hue: Math.random() > 0.8 ? Math.random() * 60 + 200 : 0, // some colored stars
+    colored: Math.random() > 0.8,
+  }));
+
+  // Dust particles
+  const dust = Array.from({length: 80}, () => ({
+    x: Math.random() * 2000, y: Math.random() * 2000,
+    r: Math.random() * 3 + 1,
+    a: Math.random() * 0.06 + 0.01,
+    dx: (Math.random() - 0.5) * 0.3,
+    dy: (Math.random() - 0.5) * 0.3,
+  }));
+
+  let t = 0;
+  function frame() {
+    if (!galaxyCanvas) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    t += 0.005;
+
+    // Draw nebulae
+    nebulae.forEach(n => {
+      n.x += n.dx; n.y += n.dy;
+      if (n.x < -n.r) n.x = canvas.width + n.r;
+      if (n.x > canvas.width + n.r) n.x = -n.r;
+      if (n.y < -n.r) n.y = canvas.height + n.r;
+      if (n.y > canvas.height + n.r) n.y = -n.r;
+      n.pulse += n.pulseSpeed;
+      const pulseOpa = n.opa * (0.8 + 0.2 * Math.sin(n.pulse));
+      const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+      grad.addColorStop(0, `hsla(${n.hue},${n.sat}%,60%,${pulseOpa})`);
+      grad.addColorStop(0.4, `hsla(${n.hue},${n.sat}%,40%,${pulseOpa * 0.5})`);
+      grad.addColorStop(1, `hsla(${n.hue},${n.sat}%,20%,0)`);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    });
+
+    // Draw dust
+    dust.forEach(d => {
+      d.x += d.dx; d.y += d.dy;
+      if (d.x < 0) d.x = canvas.width; if (d.x > canvas.width) d.x = 0;
+      if (d.y < 0) d.y = canvas.height; if (d.y > canvas.height) d.y = 0;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(180,160,255,${d.a})`;
+      ctx.fill();
+    });
+
+    // Draw stars with twinkle
+    stars.forEach(s => {
+      s.twinkle += s.twinkleSpeed;
+      const opa = s.a * (0.5 + 0.5 * Math.sin(s.twinkle));
+      ctx.beginPath();
+      ctx.arc(s.x % canvas.width, s.y % canvas.height, s.r, 0, Math.PI * 2);
+      if (s.colored) {
+        ctx.fillStyle = `hsla(${s.hue},80%,85%,${opa})`;
+      } else {
+        ctx.fillStyle = `rgba(255,255,255,${opa})`;
+      }
+      ctx.fill();
+      // Star glow for bright stars
+      if (opa > 0.6 && s.r > 1.2) {
+        const glow = ctx.createRadialGradient(s.x % canvas.width, s.y % canvas.height, 0, s.x % canvas.width, s.y % canvas.height, s.r * 4);
+        glow.addColorStop(0, s.colored ? `hsla(${s.hue},80%,85%,0.3)` : `rgba(255,255,255,0.25)`);
+        glow.addColorStop(1, 'transparent');
+        ctx.beginPath();
+        ctx.arc(s.x % canvas.width, s.y % canvas.height, s.r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
+      }
+    });
+
+    // Occasional shooting star
+    if (Math.random() < 0.003) {
+      const sx = Math.random() * canvas.width;
+      const sy = Math.random() * canvas.height * 0.6;
+      const len = Math.random() * 150 + 80;
+      const angle = (Math.random() * 30 + 10) * Math.PI / 180;
+      const grad2 = ctx.createLinearGradient(sx, sy, sx + Math.cos(angle)*len, sy + Math.sin(angle)*len);
+      grad2.addColorStop(0, 'transparent');
+      grad2.addColorStop(1, 'rgba(200,220,255,0.9)');
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + Math.cos(angle)*len, sy + Math.sin(angle)*len);
+      ctx.strokeStyle = grad2;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    galaxyAnimId = requestAnimationFrame(frame);
+  }
+  frame();
+}
+
 /* ── Init ─────────────────────────────────────────────── */
 loadData();
 applySettings();
@@ -1661,3 +2015,8 @@ initLoader();
 initCosmicBg();
 initNebulaParallax();
 updateSortUI();
+renderPredefined();
+// Close new modals on backdrop click
+['addCustomCategoryModal'].forEach(id=>{
+  const el=$(id); if(el) el.addEventListener('click',e=>{ if(e.target===el) el.style.display='none'; });
+});

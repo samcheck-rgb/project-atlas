@@ -310,7 +310,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 input::placeholder, textarea::placeholder { color: var(--muted); }
 textarea { resize: vertical; min-height: 58px; }
 select option { background: #0d1628; color: var(--text); }
-[data-theme="light"] select option { background: #fff; color: #1a202c;}
+[data-theme="light"] select option { background: #fff; color: #1a202c; box-shadow: #e5e7eb;}
 
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(7px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
 
@@ -412,16 +412,22 @@ select option { background: #0d1628; color: var(--text); }
 /* ─── Search Bar ────────────────────────────────── */
 .search-bar-wrap {
   position: relative; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
 }
-.search-bar-wrap .search-icon {
-  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-  font-size: 0.9rem; pointer-events: none; z-index: 1;
+.search-icon-outer {
+  font-size: 1rem; flex-shrink: 0; color: var(--muted);
+  pointer-events: none; user-select: none;
 }
-.search-bar-wrap input { padding-left: 36px; margin-bottom: 0; }
+.search-bar-wrap input { flex: 1; margin-bottom: 0; padding-left: 13px !important; }
 
 /* ─── Full Transactions Modal ───────────────────── */
 .full-modal { align-items: flex-start; padding: 16px; }
-.full-modal-content { max-width: 700px; max-height: calc(100vh - 32px); overflow-y: auto; }
+.full-modal-content { max-width: 700px; height: calc(100vh - 32px); max-height: calc(100vh - 32px); overflow-y: auto; display: flex; flex-direction: column; }
+.full-tx-list { flex: 1; overflow-y: auto; }
+/* Ensure sort-bar is always visible */
+.full-modal-content .sort-bar { flex-shrink: 0; }
+.full-modal-content .modal-header { flex-shrink: 0; }
+.full-modal-content .search-bar-wrap { flex-shrink: 0; }
 .full-tx-list { display: flex; flex-direction: column; }
 
 /* Sort bar */
@@ -440,7 +446,13 @@ select option { background: #0d1628; color: var(--text); }
 .sort-arrow { font-size: 0.65rem; margin-left: 3px; }
 .three-dot { font-size: 1.1rem; font-weight: 700; padding: 4px 9px; }
 .three-dot-dd { position: relative; }
-.three-dot-dd .dropdown-content { top: calc(100% + 6px); right: 0; min-width: 200px; }
+.three-dot-dd .dropdown-content {
+  top: calc(100% + 6px); right: 0; min-width: 200px;
+  max-height: 340px; overflow-y: auto;
+  z-index: 600;
+}
+/* Ensure sort-bar doesn't clip the dropdown */
+.sort-bar { overflow: visible !important; }
 
 /* Filter panel */
 .filter-panel { padding: 10px; }
@@ -611,18 +623,138 @@ body.liquid-glass[data-theme="light"] .modal-content {
 
 
 
+/* Liquid Glass → brighter, more readable text */
+body.liquid-glass .setting-name {
+  color: #ffffff !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+  font-weight: 600;
+}
+body.liquid-glass .setting-desc {
+  color: rgba(255,255,255,0.75) !important;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+body.liquid-glass .settings-section-title {
+  color: var(--accent) !important;
+  text-shadow: 0 0 12px rgba(74,222,128,0.4);
+}
+body.liquid-glass[data-theme="light"] .setting-name {
+  color: #0d1628 !important;
+  text-shadow: 0 1px 4px rgba(255,255,255,0.8);
+}
+body.liquid-glass[data-theme="light"] .setting-desc {
+  color: #374151 !important;
+}
+body.liquid-glass .sort-btn,
+body.liquid-glass .filter-opt {
+  color: rgba(255,255,255,0.9) !important;
+}
+body.liquid-glass[data-theme="light"] .sort-btn,
+body.liquid-glass[data-theme="light"] .filter-opt {
+  color: #1a202c !important;
+}
+
 /* Light mode + Liquid Glass → glow box for setting names */
 [data-theme="light"].liquid-glass .setting-name {
   position: relative;
   z-index: 1;
 }
-
 [data-theme="light"].liquid-glass .setting-name::before {
   content: "";
   position: absolute;
-  inset: -4px -8px; /* controls size of glow box */
+  inset: -4px -8px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.65);
   filter: blur(10px);
   z-index: -1;
+}
+
+/* ─── About Section ─────────────────────────────── */
+.about-section {
+  position: relative; z-index: 1;
+  padding: 18px 24px 24px;
+  display: flex; flex-direction: column; gap: 5px;
+  max-width: 720px; margin: 0 auto;
+}
+.about-line {
+  font-size: 0.72rem; color: var(--muted); display: flex; gap: 6px; align-items: baseline;
+  font-family: 'Outfit', sans-serif;
+}
+.about-label {
+  font-family: 'Orbitron', monospace; font-size: 0.58rem; letter-spacing: 0.15em;
+  color: var(--muted); text-transform: uppercase; min-width: 72px; flex-shrink: 0;
+}
+.about-author {
+  font-weight: 500; color: var(--text);
+}
+.about-muted { color: var(--muted); }
+.about-highlight {
+  font-family: 'Orbitron', monospace; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 45%, #38bdf8 75%, #a78bfa 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: shimmer 4s linear infinite, aboutGlow 2.5s ease-in-out infinite alternate;
+}
+@keyframes aboutGlow {
+  from { filter: drop-shadow(0 0 4px rgba(74,222,128,0.3)); }
+  to   { filter: drop-shadow(0 0 14px rgba(56,189,248,0.7)); }
+}
+
+/* ─── Predefined Transactions ───────────────────── */
+.predefined-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+.predefined-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px 8px; border-radius: 14px; cursor: pointer;
+  border: 1px solid var(--border); background: rgba(255,255,255,0.025);
+  font-family: 'Outfit', sans-serif; transition: all 0.2s; text-align: center;
+}
+.predefined-tile:hover { transform: translateY(-2px); border-color: var(--accent); background: rgba(74,222,128,0.06); }
+.predefined-tile.income { border-color: rgba(74,222,128,0.2); }
+.predefined-tile.expense { border-color: rgba(248,113,113,0.2); }
+.predefined-tile-icon { font-size: 1.4rem; }
+.predefined-tile-name { font-size: 0.75rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.predefined-tile-amount { font-family: 'Orbitron', monospace; font-size: 0.68rem; font-weight: 700; }
+.predefined-tile.income .predefined-tile-amount { color: var(--income); }
+.predefined-tile.expense .predefined-tile-amount { color: var(--expense); }
+.predefined-count { font-family: 'Orbitron', monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 0.1em; }
+
+/* ─── Add Transaction — category row + predefined ── */
+.category-row { display: flex; gap: 8px; align-items: center; }
+.category-row select { flex: 1; }
+.predefined-field { background: rgba(74,222,128,0.04); border: 1px solid rgba(74,222,128,0.12); border-radius: 10px; padding: 10px 12px; }
+.predefined-check-label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.predefined-check-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+.predefined-check-text { font-size: 0.86rem; font-weight: 500; color: var(--text); }
+
+/* ─── Predefined / Custom Cat Management ─────────── */
+.predefined-mgmt-list { display: flex; flex-direction: column; gap: 6px; }
+.custom-cat-list { display: flex; flex-direction: column; gap: 6px; }
+.predefined-mgmt-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+}
+.predefined-mgmt-icon { font-size: 1.1rem; flex-shrink: 0; }
+.predefined-mgmt-info { flex: 1; min-width: 0; }
+.predefined-mgmt-name { font-size: 0.84rem; font-weight: 500; color: var(--text); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.predefined-mgmt-meta { font-size: 0.7rem; color: var(--muted); }
+.predefined-mgmt-meta.income { color: var(--income); }
+.predefined-mgmt-meta.expense { color: var(--expense); }
+/* ─── Galaxy Canvas ──────────────────────────────── */
+#galaxyCanvas { z-index: 0 !important; }
+
+/* ─── Responsive for new elements ───────────────── */
+@media (max-width: 600px) {
+  .predefined-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .about-section { padding: 14px 16px 20px; }
+  .about-label { min-width: 62px; }
+  .predefined-mgmt-item { padding: 6px 10px; }
+}
+@media (max-width: 400px) {
+  .predefined-grid { grid-template-columns: repeat(3, 1fr); }
 }

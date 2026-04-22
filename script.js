@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════
-   PROJECT ATLAS — script.js  (v3)
+   PROJECT ATLAS — script.js  (v4)
    ═══════════════════════════════════════════════════ */
 
 'use strict';
@@ -29,6 +29,94 @@ const TRANSLATIONS = {
     yesDelete:'Yes, Clear All', currencyChange:'Currency Change', keepValues:'Keep Values', convert:'Convert',
     currencyConverter:'Currency Converter', from:'From', to:'To', popularPairs:'Popular Pairs',
     theme:'Theme ▾', txDeleted:'Transaction deleted', undo:'Undo',
+    // Charts / analytics
+    noExpenseData:'No expense data yet', totalExpenses:'total expenses',
+    incomeLegend:'Income', expenseLegend:'Expense',
+    biggestSpend:'Biggest spend', bestIncome:'Best income', highestSpend:'Highest spend',
+    addTxForTrends:'Add transactions to see monthly trends.',
+    addTxForHistory:'Add transactions to see balance history',
+    avgExpense:'Avg expense', currentBalance:'Current balance',
+    // Placeholders
+    phName:'e.g. Grocery shopping', phAmount:'0.00', phNote:'Add a note…',
+    phGoal:'Set target amount', phSongTitle:'Song name',
+    phCatSymbol:'e.g. ◆', phCatName:'e.g. Gaming',
+    // Feedback
+    added:'Added',
+  
+    // ── added i18n keys (full coverage) ──
+    about_label:'PROJECT',
+    about_author:'Author',
+    about_hosted:'Hosted on',
+    about_candidate:'Candidate for',
+    about_directed:'Directed by',
+    about_academy:'Academy',
+    currencyConverterTitle:'Currency Converter',
+    addTransactionTip:'Add Transaction',
+    addCustomCategoryTip:'Add custom category',
+    filterTip:'Filter',
+    galaxyMode:'Galaxy Mode',
+    galaxyModeDesc:'Experimental: nebula & deep-space effects in dark mode',
+    expTheme:'Experimental Theme',
+    expThemeDesc:'Try a completely different look. Off by default.',
+    expOff:'Off (Default)',
+    expMono:'Mono — Brutalist',
+    expCumulus:'Cumulus — Neumorphic',
+    expLedger:'Ledger — Editorial',
+    expPrism:'Prism — Glass + Neon',
+    customCategories:'Custom Categories',
+    addCustomCategory:'+ Add Custom Category',
+    quickTransactions:'Quick Transactions',
+    quickTransactionsHeader:'QUICK TRANSACTIONS',
+    quickTxManageDesc:'Manage your saved quick transactions (max',
+    noQuickTxSaved:'No quick transactions saved yet.',
+    noQuickTxYet:'No quick transactions yet. Mark a transaction as predefined when adding.',
+    saveAsQuick:'Save as Quick Transaction',
+    saveAsQuickDesc:'Adds this to your Quick Transactions panel for fast reuse',
+    lightDarkTip:'Light/Dark Mode',
+    settingsTip:'Settings',
+    liteBtn:'Lite',
+    fullBtn:'Full',
+    clickExpand:'Click to expand',
+    selectSongBelow:'Select a song below',
+    loopAll:'↻ All',
+    loopOne:'↺ One',
+    loopRandom:'⇄ Random',
+    volMinus:'vol−',
+    volPlus:'vol+',
+    audioFile:'Audio File',
+    chooseAudio:'Choose audio file…',
+    songTitleLabel:'Title',
+    trimSong:'Trim Song',
+    startLabel:'Start:',
+    endLabel:'End:',
+    addSongBtn:'Add Song',
+    addCustomCategoryHeader:'Add Custom Category',
+    symbolLabel:'Symbol',
+    symbolHint:'Pick a symbol (e.g. ◆ ◈ ◉ ▲ ● ♦ ✦ ✧)',
+    categoryName:'Category Name',
+    addCategoryBtn:'Add Category',
+    addCustomSong:'Add Custom Song',
+    noCustomCats:'No custom categories yet.',
+    editTip:'Edit',
+    deleteTip:'Delete',
+    removeTip:'Remove',
+    playSongTip:'Play this song',
+    enableDisableTip:'Enable/Disable',
+    swapCurrencies:'Swap currencies',
+    copyClipboard:'Copy to clipboard',
+    noAudio:'No audio — add via + Add Your Own Song',
+    unknownSong:'Unknown',
+    fetchingRate:'Fetching live rate…',
+    cantFetchRate:'Could not fetch live rate. You can still switch currencies without converting.',
+    liveRateVia:'Live rate via Open Exchange Rates',
+    liveRateFrankfurter:'Live rate via frankfurter.app',
+    unableFetch:'Unable to fetch',
+    checkConnection:'Check your connection',
+    currencySwitchPrompt:'You\'re switching from {from} to {to}. Do you want to convert your existing values using today\'s live exchange rate?',
+    deleteConfirmText:'Delete "{name}" ({sign}{currency}{amount})? This cannot be undone.',
+    optional:'(optional)',
+    totalBalanceShort:'TOTAL BALANCE',
+    songCustomTag:'custom',
   },
   es: {
     totalBalance:'SALDO TOTAL', savingGoal:'Meta de Ahorro', setGoal:'Establece una meta para seguir tu progreso',
@@ -53,6 +141,91 @@ const TRANSLATIONS = {
     yesDelete:'Sí, Borrar Todo', currencyChange:'Cambio de Moneda', keepValues:'Mantener Valores', convert:'Convertir',
     currencyConverter:'Conversor de Moneda', from:'De', to:'A', popularPairs:'Pares Populares',
     theme:'Tema ▾', txDeleted:'Transacción eliminada', undo:'Deshacer',
+    noExpenseData:'Aún no hay datos de gastos', totalExpenses:'gastos totales',
+    incomeLegend:'Ingresos', expenseLegend:'Gastos',
+    biggestSpend:'Mayor gasto', bestIncome:'Mejor ingreso', highestSpend:'Mayor gasto mensual',
+    addTxForTrends:'Añade transacciones para ver tendencias mensuales.',
+    addTxForHistory:'Añade transacciones para ver el historial del saldo',
+    avgExpense:'Gasto medio', currentBalance:'Saldo actual',
+    phName:'p. ej. Compra de comida', phAmount:'0,00', phNote:'Añade una nota…',
+    phGoal:'Establecer importe objetivo', phSongTitle:'Nombre de la canción',
+    phCatSymbol:'p. ej. ◆', phCatName:'p. ej. Juegos',
+    added:'Añadido',
+  
+    // ── added i18n keys (full coverage) ──
+    about_label:'PROYECTO',
+    about_author:'Autor',
+    about_hosted:'Alojado en',
+    about_candidate:'Candidato a',
+    about_directed:'Dirigido por',
+    about_academy:'Academia',
+    currencyConverterTitle:'Conversor de Moneda',
+    addTransactionTip:'Añadir Transacción',
+    addCustomCategoryTip:'Añadir categoría personalizada',
+    filterTip:'Filtrar',
+    galaxyMode:'Modo Galaxia',
+    galaxyModeDesc:'Experimental: efectos de nebulosa y espacio profundo en modo oscuro',
+    expTheme:'Tema Experimental',
+    expThemeDesc:'Prueba un aspecto completamente diferente. Desactivado por defecto.',
+    expOff:'Desactivado (Predeterminado)',
+    expMono:'Mono — Brutalista',
+    expCumulus:'Cumulus — Neumórfico',
+    expLedger:'Ledger — Editorial',
+    expPrism:'Prism — Vidrio + Neón',
+    customCategories:'Categorías Personalizadas',
+    addCustomCategory:'+ Añadir Categoría',
+    quickTransactions:'Transacciones Rápidas',
+    quickTransactionsHeader:'TRANSACCIONES RÁPIDAS',
+    quickTxManageDesc:'Gestiona tus transacciones rápidas guardadas (máx.',
+    noQuickTxSaved:'Aún no hay transacciones rápidas guardadas.',
+    noQuickTxYet:'No hay transacciones rápidas. Marca una al añadirla.',
+    saveAsQuick:'Guardar como Transacción Rápida',
+    saveAsQuickDesc:'La añade a tu panel de Transacciones Rápidas para reusarla',
+    lightDarkTip:'Modo Claro/Oscuro',
+    settingsTip:'Ajustes',
+    liteBtn:'Lite',
+    fullBtn:'Completo',
+    clickExpand:'Haz clic para expandir',
+    selectSongBelow:'Selecciona una canción abajo',
+    loopAll:'↻ Todas',
+    loopOne:'↺ Una',
+    loopRandom:'⇄ Aleatorio',
+    volMinus:'vol−',
+    volPlus:'vol+',
+    audioFile:'Archivo de Audio',
+    chooseAudio:'Elegir archivo de audio…',
+    songTitleLabel:'Título',
+    trimSong:'Recortar Canción',
+    startLabel:'Inicio:',
+    endLabel:'Fin:',
+    addSongBtn:'Añadir Canción',
+    addCustomCategoryHeader:'Añadir Categoría Personalizada',
+    symbolLabel:'Símbolo',
+    symbolHint:'Elige un símbolo (p. ej. ◆ ◈ ◉ ▲ ● ♦ ✦ ✧)',
+    categoryName:'Nombre de Categoría',
+    addCategoryBtn:'Añadir Categoría',
+    addCustomSong:'Añadir Canción Personalizada',
+    noCustomCats:'Aún no hay categorías personalizadas.',
+    editTip:'Editar',
+    deleteTip:'Eliminar',
+    removeTip:'Quitar',
+    playSongTip:'Reproducir esta canción',
+    enableDisableTip:'Activar/Desactivar',
+    swapCurrencies:'Intercambiar monedas',
+    copyClipboard:'Copiar al portapapeles',
+    noAudio:'Sin audio — añade vía + Añadir Canción',
+    unknownSong:'Desconocido',
+    fetchingRate:'Obteniendo tasa en vivo…',
+    cantFetchRate:'No se pudo obtener la tasa en vivo. Aún puedes cambiar de moneda sin convertir.',
+    liveRateVia:'Tasa en vivo vía Open Exchange Rates',
+    liveRateFrankfurter:'Tasa en vivo vía frankfurter.app',
+    unableFetch:'No se puede obtener',
+    checkConnection:'Verifica tu conexión',
+    currencySwitchPrompt:'Cambias de {from} a {to}. ¿Quieres convertir tus valores actuales con la tasa de cambio en vivo de hoy?',
+    deleteConfirmText:'¿Eliminar "{name}" ({sign}{currency}{amount})? Esto no se puede deshacer.',
+    optional:'(opcional)',
+    totalBalanceShort:'SALDO TOTAL',
+    songCustomTag:'personalizado',
   },
   ru: {
     totalBalance:'ОБЩИЙ БАЛАНС', savingGoal:'Цель Накоплений', setGoal:'Установите цель для отслеживания прогресса',
@@ -77,6 +250,91 @@ const TRANSLATIONS = {
     yesDelete:'Да, Очистить', currencyChange:'Смена Валюты', keepValues:'Оставить Значения', convert:'Конвертировать',
     currencyConverter:'Конвертер Валют', from:'Из', to:'В', popularPairs:'Популярные Пары',
     theme:'Тема ▾', txDeleted:'Операция удалена', undo:'Отменить',
+    noExpenseData:'Пока нет данных о расходах', totalExpenses:'всего расходов',
+    incomeLegend:'Доход', expenseLegend:'Расход',
+    biggestSpend:'Наибольший расход', bestIncome:'Лучший доход', highestSpend:'Самый большой расход',
+    addTxForTrends:'Добавьте операции, чтобы увидеть тренды.',
+    addTxForHistory:'Добавьте операции, чтобы увидеть историю баланса',
+    avgExpense:'Средний расход', currentBalance:'Текущий баланс',
+    phName:'напр. Продукты', phAmount:'0,00', phNote:'Добавить заметку…',
+    phGoal:'Укажите целевую сумму', phSongTitle:'Название песни',
+    phCatSymbol:'напр. ◆', phCatName:'напр. Игры',
+    added:'Добавлено',
+  
+    // ── added i18n keys (full coverage) ──
+    about_label:'ПРОЕКТ',
+    about_author:'Автор',
+    about_hosted:'Размещён на',
+    about_candidate:'Кандидат на',
+    about_directed:'Под руководством',
+    about_academy:'Академия',
+    currencyConverterTitle:'Конвертер Валют',
+    addTransactionTip:'Добавить Операцию',
+    addCustomCategoryTip:'Добавить категорию',
+    filterTip:'Фильтр',
+    galaxyMode:'Режим Галактика',
+    galaxyModeDesc:'Экспериментально: эффекты туманности и космоса в тёмной теме',
+    expTheme:'Экспериментальная Тема',
+    expThemeDesc:'Попробуйте совершенно другой вид. По умолчанию выключено.',
+    expOff:'Выкл. (По умолчанию)',
+    expMono:'Mono — Брутализм',
+    expCumulus:'Cumulus — Неоморфизм',
+    expLedger:'Ledger — Редакционный',
+    expPrism:'Prism — Стекло + Неон',
+    customCategories:'Свои Категории',
+    addCustomCategory:'+ Добавить Категорию',
+    quickTransactions:'Быстрые Операции',
+    quickTransactionsHeader:'БЫСТРЫЕ ОПЕРАЦИИ',
+    quickTxManageDesc:'Управляйте сохранёнными быстрыми операциями (макс.',
+    noQuickTxSaved:'Пока нет сохранённых быстрых операций.',
+    noQuickTxYet:'Пока нет быстрых операций. Отметьте операцию при добавлении.',
+    saveAsQuick:'Сохранить как Быструю Операцию',
+    saveAsQuickDesc:'Добавляет в панель быстрых операций для повторного использования',
+    lightDarkTip:'Светлый/Тёмный Режим',
+    settingsTip:'Настройки',
+    liteBtn:'Lite',
+    fullBtn:'Полная',
+    clickExpand:'Нажмите чтобы развернуть',
+    selectSongBelow:'Выберите песню ниже',
+    loopAll:'↻ Все',
+    loopOne:'↺ Одна',
+    loopRandom:'⇄ Случайно',
+    volMinus:'гр−',
+    volPlus:'гр+',
+    audioFile:'Аудиофайл',
+    chooseAudio:'Выберите аудиофайл…',
+    songTitleLabel:'Название',
+    trimSong:'Обрезать Песню',
+    startLabel:'Начало:',
+    endLabel:'Конец:',
+    addSongBtn:'Добавить Песню',
+    addCustomCategoryHeader:'Добавить Свою Категорию',
+    symbolLabel:'Символ',
+    symbolHint:'Выберите символ (напр. ◆ ◈ ◉ ▲ ● ♦ ✦ ✧)',
+    categoryName:'Название Категории',
+    addCategoryBtn:'Добавить Категорию',
+    addCustomSong:'Добавить Свою Песню',
+    noCustomCats:'Пока нет своих категорий.',
+    editTip:'Изменить',
+    deleteTip:'Удалить',
+    removeTip:'Убрать',
+    playSongTip:'Воспроизвести эту песню',
+    enableDisableTip:'Включить/Выключить',
+    swapCurrencies:'Поменять валюты',
+    copyClipboard:'Копировать в буфер',
+    noAudio:'Нет аудио — добавьте через + Добавить Песню',
+    unknownSong:'Неизвестно',
+    fetchingRate:'Получаем курс…',
+    cantFetchRate:'Не удалось получить курс. Можно сменить валюту без конвертации.',
+    liveRateVia:'Курс в реальном времени через Open Exchange Rates',
+    liveRateFrankfurter:'Курс в реальном времени через frankfurter.app',
+    unableFetch:'Не удалось получить',
+    checkConnection:'Проверьте соединение',
+    currencySwitchPrompt:'Вы переключаетесь с {from} на {to}. Конвертировать существующие значения по сегодняшнему курсу?',
+    deleteConfirmText:'Удалить "{name}" ({sign}{currency}{amount})? Это нельзя отменить.',
+    optional:'(необязательно)',
+    totalBalanceShort:'ОБЩИЙ БАЛАНС',
+    songCustomTag:'своё',
   },
   tr: {
     totalBalance:'TOPLAM BAKİYE', savingGoal:'Tasarruf Hedefi', setGoal:'İlerlemeyi takip etmek için hedef belirleyin',
@@ -101,6 +359,91 @@ const TRANSLATIONS = {
     yesDelete:'Evet, Temizle', currencyChange:'Para Birimi Değişimi', keepValues:'Değerleri Koru', convert:'Dönüştür',
     currencyConverter:'Döviz Çevirici', from:'Kaynak', to:'Hedef', popularPairs:'Popüler Çiftler',
     theme:'Tema ▾', txDeleted:'İşlem silindi', undo:'Geri Al',
+    noExpenseData:'Henüz harcama verisi yok', totalExpenses:'toplam harcama',
+    incomeLegend:'Gelir', expenseLegend:'Gider',
+    biggestSpend:'En büyük harcama', bestIncome:'En iyi gelir', highestSpend:'En yüksek harcama',
+    addTxForTrends:'Aylık eğilimleri görmek için işlem ekleyin.',
+    addTxForHistory:'Bakiye geçmişini görmek için işlem ekleyin',
+    avgExpense:'Ortalama harcama', currentBalance:'Mevcut bakiye',
+    phName:'ör. Market alışverişi', phAmount:'0,00', phNote:'Bir not ekle…',
+    phGoal:'Hedef tutar belirle', phSongTitle:'Şarkı adı',
+    phCatSymbol:'ör. ◆', phCatName:'ör. Oyun',
+    added:'Eklendi',
+  
+    // ── added i18n keys (full coverage) ──
+    about_label:'PROJE',
+    about_author:'Yazar',
+    about_hosted:'Barındırılıyor',
+    about_candidate:'Aday',
+    about_directed:'Yöneten',
+    about_academy:'Akademi',
+    currencyConverterTitle:'Döviz Çevirici',
+    addTransactionTip:'İşlem Ekle',
+    addCustomCategoryTip:'Özel kategori ekle',
+    filterTip:'Filtrele',
+    galaxyMode:'Galaksi Modu',
+    galaxyModeDesc:'Deneysel: koyu modda nebula ve derin uzay efektleri',
+    expTheme:'Deneysel Tema',
+    expThemeDesc:'Tamamen farklı bir görünüm dene. Varsayılan olarak kapalı.',
+    expOff:'Kapalı (Varsayılan)',
+    expMono:'Mono — Brütalist',
+    expCumulus:'Cumulus — Neumorfik',
+    expLedger:'Ledger — Editöryel',
+    expPrism:'Prism — Cam + Neon',
+    customCategories:'Özel Kategoriler',
+    addCustomCategory:'+ Özel Kategori Ekle',
+    quickTransactions:'Hızlı İşlemler',
+    quickTransactionsHeader:'HIZLI İŞLEMLER',
+    quickTxManageDesc:'Kayıtlı hızlı işlemlerinizi yönetin (maks.',
+    noQuickTxSaved:'Henüz kaydedilmiş hızlı işlem yok.',
+    noQuickTxYet:'Henüz hızlı işlem yok. Eklerken işaretle.',
+    saveAsQuick:'Hızlı İşlem olarak Kaydet',
+    saveAsQuickDesc:'Hızlı işlemler paneline ekler, yeniden kullanım için',
+    lightDarkTip:'Açık/Koyu Mod',
+    settingsTip:'Ayarlar',
+    liteBtn:'Lite',
+    fullBtn:'Tam',
+    clickExpand:'Genişletmek için tıkla',
+    selectSongBelow:'Aşağıdan bir şarkı seçin',
+    loopAll:'↻ Tümü',
+    loopOne:'↺ Tek',
+    loopRandom:'⇄ Karışık',
+    volMinus:'ses−',
+    volPlus:'ses+',
+    audioFile:'Ses Dosyası',
+    chooseAudio:'Ses dosyası seç…',
+    songTitleLabel:'Başlık',
+    trimSong:'Şarkıyı Kırp',
+    startLabel:'Başlangıç:',
+    endLabel:'Bitiş:',
+    addSongBtn:'Şarkı Ekle',
+    addCustomCategoryHeader:'Özel Kategori Ekle',
+    symbolLabel:'Sembol',
+    symbolHint:'Bir sembol seç (ör. ◆ ◈ ◉ ▲ ● ♦ ✦ ✧)',
+    categoryName:'Kategori Adı',
+    addCategoryBtn:'Kategori Ekle',
+    addCustomSong:'Özel Şarkı Ekle',
+    noCustomCats:'Henüz özel kategori yok.',
+    editTip:'Düzenle',
+    deleteTip:'Sil',
+    removeTip:'Kaldır',
+    playSongTip:'Bu şarkıyı çal',
+    enableDisableTip:'Aç/Kapat',
+    swapCurrencies:'Para birimlerini değiştir',
+    copyClipboard:'Panoya kopyala',
+    noAudio:'Ses yok — + Şarkı Ekle ile ekleyin',
+    unknownSong:'Bilinmiyor',
+    fetchingRate:'Canlı kur alınıyor…',
+    cantFetchRate:'Canlı kur alınamadı. Dönüştürmeden de para birimi değiştirebilirsiniz.',
+    liveRateVia:'Canlı kur: Open Exchange Rates',
+    liveRateFrankfurter:'Canlı kur: frankfurter.app',
+    unableFetch:'Alınamıyor',
+    checkConnection:'Bağlantınızı kontrol edin',
+    currencySwitchPrompt:'{from} biriminden {to} birimine geçiyorsunuz. Mevcut değerleri bugünkü canlı kurla dönüştürmek ister misiniz?',
+    deleteConfirmText:'"{name}" ({sign}{currency}{amount}) silinsin mi? Bu geri alınamaz.',
+    optional:'(isteğe bağlı)',
+    totalBalanceShort:'TOPLAM BAKİYE',
+    songCustomTag:'özel',
   },
   de: {
     totalBalance:'GESAMTGUTHABEN', savingGoal:'Sparziel', setGoal:'Legen Sie ein Ziel fest, um Ihren Fortschritt zu verfolgen',
@@ -125,6 +468,91 @@ const TRANSLATIONS = {
     yesDelete:'Ja, alles löschen', currencyChange:'Währungsänderung', keepValues:'Werte behalten', convert:'Konvertieren',
     currencyConverter:'Währungsrechner', from:'Von', to:'Nach', popularPairs:'Beliebte Paare',
     theme:'Thema ▾', txDeleted:'Transaktion gelöscht', undo:'Rückgängig',
+    noExpenseData:'Noch keine Ausgabendaten', totalExpenses:'Gesamtausgaben',
+    incomeLegend:'Einnahmen', expenseLegend:'Ausgaben',
+    biggestSpend:'Größte Ausgabe', bestIncome:'Beste Einnahme', highestSpend:'Höchste Ausgabe',
+    addTxForTrends:'Füge Transaktionen hinzu, um Monatstrends zu sehen.',
+    addTxForHistory:'Füge Transaktionen hinzu, um den Saldoverlauf zu sehen',
+    avgExpense:'Ø Ausgabe', currentBalance:'Aktueller Saldo',
+    phName:'z. B. Lebensmitteleinkauf', phAmount:'0,00', phNote:'Notiz hinzufügen…',
+    phGoal:'Zielbetrag festlegen', phSongTitle:'Songname',
+    phCatSymbol:'z. B. ◆', phCatName:'z. B. Gaming',
+    added:'Hinzugefügt',
+  
+    // ── added i18n keys (full coverage) ──
+    about_label:'PROJEKT',
+    about_author:'Autor',
+    about_hosted:'Gehostet auf',
+    about_candidate:'Kandidat für',
+    about_directed:'Geleitet von',
+    about_academy:'Akademie',
+    currencyConverterTitle:'Währungsrechner',
+    addTransactionTip:'Transaktion hinzufügen',
+    addCustomCategoryTip:'Eigene Kategorie hinzufügen',
+    filterTip:'Filter',
+    galaxyMode:'Galaxie-Modus',
+    galaxyModeDesc:'Experimentell: Nebel- und Weltraumeffekte im Dunkelmodus',
+    expTheme:'Experimentelles Thema',
+    expThemeDesc:'Probiere ein völlig anderes Aussehen. Standardmäßig aus.',
+    expOff:'Aus (Standard)',
+    expMono:'Mono — Brutalistisch',
+    expCumulus:'Cumulus — Neumorph',
+    expLedger:'Ledger — Editorial',
+    expPrism:'Prism — Glas + Neon',
+    customCategories:'Eigene Kategorien',
+    addCustomCategory:'+ Eigene Kategorie hinzufügen',
+    quickTransactions:'Schnellbuchungen',
+    quickTransactionsHeader:'SCHNELLBUCHUNGEN',
+    quickTxManageDesc:'Verwalte deine gespeicherten Schnellbuchungen (max.',
+    noQuickTxSaved:'Noch keine Schnellbuchungen gespeichert.',
+    noQuickTxYet:'Noch keine Schnellbuchungen. Beim Hinzufügen markieren.',
+    saveAsQuick:'Als Schnellbuchung speichern',
+    saveAsQuickDesc:'Fügt sie deinem Schnellbuchungs-Panel zur Wiederverwendung hinzu',
+    lightDarkTip:'Hell-/Dunkelmodus',
+    settingsTip:'Einstellungen',
+    liteBtn:'Lite',
+    fullBtn:'Voll',
+    clickExpand:'Klicken zum Erweitern',
+    selectSongBelow:'Wähle einen Song unten',
+    loopAll:'↻ Alle',
+    loopOne:'↺ Eins',
+    loopRandom:'⇄ Zufällig',
+    volMinus:'Lt−',
+    volPlus:'Lt+',
+    audioFile:'Audiodatei',
+    chooseAudio:'Audiodatei wählen…',
+    songTitleLabel:'Titel',
+    trimSong:'Song zuschneiden',
+    startLabel:'Anfang:',
+    endLabel:'Ende:',
+    addSongBtn:'Song hinzufügen',
+    addCustomCategoryHeader:'Eigene Kategorie hinzufügen',
+    symbolLabel:'Symbol',
+    symbolHint:'Wähle ein Symbol (z. B. ◆ ◈ ◉ ▲ ● ♦ ✦ ✧)',
+    categoryName:'Kategoriename',
+    addCategoryBtn:'Kategorie hinzufügen',
+    addCustomSong:'Eigenen Song hinzufügen',
+    noCustomCats:'Noch keine eigenen Kategorien.',
+    editTip:'Bearbeiten',
+    deleteTip:'Löschen',
+    removeTip:'Entfernen',
+    playSongTip:'Diesen Song abspielen',
+    enableDisableTip:'Aktivieren/Deaktivieren',
+    swapCurrencies:'Währungen tauschen',
+    copyClipboard:'In Zwischenablage kopieren',
+    noAudio:'Kein Audio — über + Song hinzufügen ergänzen',
+    unknownSong:'Unbekannt',
+    fetchingRate:'Live-Kurs wird abgerufen…',
+    cantFetchRate:'Live-Kurs konnte nicht abgerufen werden. Du kannst die Währung trotzdem ohne Umrechnung wechseln.',
+    liveRateVia:'Live-Kurs via Open Exchange Rates',
+    liveRateFrankfurter:'Live-Kurs via frankfurter.app',
+    unableFetch:'Abruf nicht möglich',
+    checkConnection:'Prüfe deine Verbindung',
+    currencySwitchPrompt:'Du wechselst von {from} zu {to}. Möchtest du deine bestehenden Werte mit dem heutigen Live-Kurs umrechnen?',
+    deleteConfirmText:'"{name}" ({sign}{currency}{amount}) löschen? Dies kann nicht rückgängig gemacht werden.',
+    optional:'(optional)',
+    totalBalanceShort:'GESAMTGUTHABEN',
+    songCustomTag:'eigen',
   },
   fa: {
     totalBalance:'موجودی کل',
@@ -195,6 +623,92 @@ const TRANSLATIONS = {
     theme:'تم ▾',
     txDeleted:'تراکنش حذف شد',
     undo:'بازگردانی',
+    noExpenseData:'هنوز داده‌ای برای هزینه‌ها وجود ندارد',
+    totalExpenses:'مجموع هزینه‌ها',
+    incomeLegend:'درآمد', expenseLegend:'هزینه',
+    biggestSpend:'بیشترین هزینه', bestIncome:'بهترین درآمد', highestSpend:'بالاترین هزینه',
+    addTxForTrends:'برای دیدن روند ماهانه، تراکنش اضافه کنید.',
+    addTxForHistory:'برای دیدن تاریخچه موجودی، تراکنش اضافه کنید',
+    avgExpense:'میانگین هزینه', currentBalance:'موجودی فعلی',
+    phName:'مثلاً خرید خواروبار', phAmount:'۰٫۰۰', phNote:'یادداشتی اضافه کنید…',
+    phGoal:'مبلغ هدف را تعیین کنید', phSongTitle:'نام آهنگ',
+    phCatSymbol:'مثلاً ◆', phCatName:'مثلاً بازی',
+    added:'اضافه شد',
+  
+    // ── added i18n keys (full coverage) ──
+    about_label:'پروژه',
+    about_author:'نویسنده',
+    about_hosted:'میزبانی شده در',
+    about_candidate:'کاندیدای',
+    about_directed:'به کارگردانی',
+    about_academy:'آکادمی',
+    currencyConverterTitle:'مبدل ارز',
+    addTransactionTip:'افزودن تراکنش',
+    addCustomCategoryTip:'افزودن دسته‌بندی سفارشی',
+    filterTip:'فیلتر',
+    galaxyMode:'حالت کهکشان',
+    galaxyModeDesc:'آزمایشی: جلوه‌های سحابی و فضای عمیق در حالت تاریک',
+    expTheme:'تم آزمایشی',
+    expThemeDesc:'یک ظاهر کاملاً متفاوت را امتحان کنید. به‌طور پیش‌فرض خاموش است.',
+    expOff:'خاموش (پیش‌فرض)',
+    expMono:'مونو — برتالیست',
+    expCumulus:'کومولوس — نئومورفیک',
+    expLedger:'لجر — تحریری',
+    expPrism:'پریزم — شیشه + نئون',
+    customCategories:'دسته‌بندی‌های سفارشی',
+    addCustomCategory:'+ افزودن دسته‌بندی سفارشی',
+    quickTransactions:'تراکنش‌های سریع',
+    quickTransactionsHeader:'تراکنش‌های سریع',
+    quickTxManageDesc:'تراکنش‌های سریع ذخیره‌شده خود را مدیریت کنید (حداکثر',
+    noQuickTxSaved:'هنوز تراکنش سریعی ذخیره نشده است.',
+    noQuickTxYet:'هنوز تراکنش سریعی نیست. هنگام افزودن، تراکنش را به‌عنوان از پیش تعیین‌شده علامت بزنید.',
+    saveAsQuick:'ذخیره به‌عنوان تراکنش سریع',
+    saveAsQuickDesc:'این مورد را برای استفاده مجدد سریع به پنل تراکنش‌های سریع شما اضافه می‌کند',
+    lightDarkTip:'حالت روشن/تاریک',
+    settingsTip:'تنظیمات',
+    liteBtn:'سبک',
+    fullBtn:'کامل',
+    clickExpand:'برای گسترش کلیک کنید',
+    selectSongBelow:'یک آهنگ از پایین انتخاب کنید',
+    loopAll:'↻ همه',
+    loopOne:'↺ یکی',
+    loopRandom:'⇄ تصادفی',
+    volMinus:'صدا−',
+    volPlus:'صدا+',
+    audioFile:'فایل صوتی',
+    chooseAudio:'فایل صوتی را انتخاب کنید…',
+    songTitleLabel:'عنوان',
+    trimSong:'برش آهنگ',
+    startLabel:'شروع:',
+    endLabel:'پایان:',
+    addSongBtn:'افزودن آهنگ',
+    addCustomCategoryHeader:'افزودن دسته‌بندی سفارشی',
+    symbolLabel:'نماد',
+    symbolHint:'یک نماد انتخاب کنید (مثلاً ◆ ◈ ◉ ▲ ● ♦ ✦ ✧)',
+    categoryName:'نام دسته‌بندی',
+    addCategoryBtn:'افزودن دسته‌بندی',
+    addCustomSong:'افزودن آهنگ سفارشی',
+    noCustomCats:'هنوز دسته‌بندی سفارشی وجود ندارد.',
+    editTip:'ویرایش',
+    deleteTip:'حذف',
+    removeTip:'برداشتن',
+    playSongTip:'این آهنگ را پخش کن',
+    enableDisableTip:'فعال/غیرفعال',
+    swapCurrencies:'تعویض ارزها',
+    copyClipboard:'کپی در کلیپ‌بورد',
+    noAudio:'بدون صدا — از طریق + افزودن آهنگ خود اضافه کنید',
+    unknownSong:'نامشخص',
+    fetchingRate:'در حال دریافت نرخ زنده…',
+    cantFetchRate:'نرخ زنده دریافت نشد. می‌توانید بدون تبدیل، ارز را تغییر دهید.',
+    liveRateVia:'نرخ زنده از Open Exchange Rates',
+    liveRateFrankfurter:'نرخ زنده از frankfurter.app',
+    unableFetch:'امکان دریافت نیست',
+    checkConnection:'اتصال خود را بررسی کنید',
+    currencySwitchPrompt:'از {from} به {to} تغییر می‌دهید. آیا می‌خواهید مقادیر فعلی را با نرخ زنده امروز تبدیل کنید؟',
+    deleteConfirmText:'«{name}» ({sign}{currency}{amount}) حذف شود؟ این عمل قابل بازگشت نیست.',
+    optional:'(اختیاری)',
+    totalBalanceShort:'موجودی کل',
+    songCustomTag:'سفارشی',
   }
 };
 
@@ -207,12 +721,30 @@ function t(key) {
 function applyTranslations() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (key) el.textContent = t(key);
+    if (!key) return;
+
+    const arrow = el.querySelector('.sort-arrow');
+    if (arrow) {
+      const labelNode = [...el.childNodes].find(node => node.nodeType === Node.TEXT_NODE);
+      if (labelNode) {
+        labelNode.textContent = `${t(key)} `;
+      } else {
+        el.insertBefore(document.createTextNode(`${t(key)} `), el.firstChild);
+      }
+      return;
+    }
+
+    el.textContent = t(key);
   });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     if (key) el.placeholder = t(key);
   });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    if (key) el.title = t(key);
+  });
+  updateSortUI();
   // Update page title
   document.title = `Project Atlas`;
 }
@@ -222,6 +754,14 @@ function changeLanguage(lang) {
   settings.language = lang;
   applyTranslations();
   renderTransactions();
+  if (typeof updateUI === 'function') {
+    try { updateUI(); } catch(_) {}
+  }
+  if (typeof renderPredefined === 'function') renderPredefined();
+  if (typeof renderSongList === 'function') renderSongList();
+  if (typeof renderCustomCatList === 'function') renderCustomCatList();
+  if (typeof renderPredefinedMgmt === 'function') renderPredefinedMgmt();
+  if (typeof updateNowPlaying === 'function') updateNowPlaying();
   saveData();
 }
 
@@ -243,6 +783,7 @@ let settings = {
   volume        : 0.7,
   currentSong   : 0,
   language      : 'en',
+  experimentalTheme: 'off', // off | mono | cumulus | ledger | prism
 };
 let songs = [
   { title:'Cosmic Drift',    artist:'Project Atlas', src:'music/cosmic_drift.mp3',   custom:false, enabled:true, trimStart:0, trimEnd:null },
@@ -257,13 +798,13 @@ let songs = [
 const MAX_PREDEFINED = 16;
 
 const DEFAULT_CATEGORIES = [
-  { name:'General',   emoji:'📋' },
-  { name:'Food',      emoji:'🍔' },
-  { name:'Transport', emoji:'🚌' },
-  { name:'Bills',     emoji:'💡' },
-  { name:'Shopping',  emoji:'🛍' },
-  { name:'Salary',    emoji:'💼' },
-  { name:'Other',     emoji:'📦' },
+  { name:'General',   emoji:'◈' },
+  { name:'Food',      emoji:'◉' },
+  { name:'Transport', emoji:'▲' },
+  { name:'Bills',     emoji:'✦' },
+  { name:'Shopping',  emoji:'◆' },
+  { name:'Salary',    emoji:'★' },
+  { name:'Other',     emoji:'●' },
 ];
 let customCategories = []; // {name, emoji} — user-added
 let predefinedTransactions = []; // {name, amount, type, category, note} up to MAX_PREDEFINED
@@ -340,7 +881,7 @@ function applySettings() {
   document.documentElement.style.setProperty('--accent', accentColor);
   document.documentElement.style.setProperty('--income', accentColor);
   document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
-  $('modeBtn').textContent = settings.darkMode ? '🌙' : '☀️';
+  $('modeBtn').textContent = settings.darkMode ? '☾' : '☀';
   document.body.classList.toggle('liquid-glass', settings.liquidGlass);
   $('stgConfirmDelete').checked  = settings.confirmDelete;
   $('stgTsFormat').value         = settings.tsFormat;
@@ -359,6 +900,8 @@ function applySettings() {
   applyTranslations();
   populateCategorySelects();
   if (galaxyMode && settings.darkMode) startGalaxyMode(); else stopGalaxyMode();
+  applyExperimentalTheme(settings.experimentalTheme || 'off');
+  if ($('stgExpTheme')) $('stgExpTheme').value = settings.experimentalTheme || 'off';
 }
 
 /* ── Rolling Number Animation ─────────────────────────── */
@@ -652,8 +1195,8 @@ function buildTxItem(t, realIdx, inFull) {
     </div>
     <div class="t-amount ${t.type}">${sign}${currency}${t.amount.toFixed(2)}</div>
     <div class="t-actions">
-      <button class="t-edit" onclick="openEdit(${realIdx})" title="Edit">✏</button>
-      <button class="t-delete" onclick="requestDelete(${realIdx})" title="Delete">✕</button>
+      <button class="t-edit" onclick="openEdit(${realIdx})" title="${t('editTip')}">✏</button>
+      <button class="t-delete" onclick="requestDelete(${realIdx})" title="${t('deleteTip')}">✕</button>
     </div>
   `;
   return div;
@@ -717,6 +1260,27 @@ function switchAnalyticsTab(tab) {
   updateAnalytics();
 }
 
+
+function setupHiDPICanvas(canvas) {
+  if (!canvas) return null;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const cssW = Math.max(1, Math.floor(rect.width));
+  const cssH = Math.max(1, Math.floor(rect.height || canvas.height));
+  // Set display size
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  // Set backing buffer size
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // Store logical size for drawing
+  canvas._logicalW = cssW;
+  canvas._logicalH = cssH;
+  return ctx;
+}
+
 function updateAnalytics() {
   if (activeAnalyticsTab === 'donut') drawDonut();
   else if (activeAnalyticsTab === 'bar') drawBar();
@@ -731,9 +1295,11 @@ function getThemeColor(opacity = 1) {
 function drawDonut() {
   const canvas = $('donutChart');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  const ctx = setupHiDPICanvas(canvas);
+  const W = canvas._logicalW, H = canvas._logicalH;
   ctx.clearRect(0, 0, W, H);
+  ctx.imageSmoothingEnabled = true;
+  ctx.textBaseline = 'alphabetic';
 
   const BASE_COLORS = ['#4ade80','#38bdf8','#f97316','#f59e0b','#a78bfa','#34d399','#fb7185','#e879f9','#22d3ee','#fbbf24','#f472b6','#6ee7b7','#818cf8','#f87171','#34d399','#a3e635'];
   const allCatsList = getAllCategories();
@@ -753,8 +1319,8 @@ function drawDonut() {
     ctx.fillStyle = getThemeColor(0.18);
     ctx.beginPath(); ctx.arc(W/2, H/2, 90, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = getThemeColor(0.4);
-    ctx.font = '14px Outfit'; ctx.textAlign = 'center';
-    ctx.fillText('No expense data yet', W/2, H/2 + 5);
+    ctx.font = '14px Outfit, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(t('noExpenseData'), W/2, H/2 + 5);
     if (legend) legend.innerHTML = '';
     if (insight) insight.innerHTML = '';
     return;
@@ -784,12 +1350,12 @@ function drawDonut() {
 
   // Center text
   ctx.fillStyle = getThemeColor(0.9);
-  ctx.font = 'bold 15px Orbitron, monospace';
+  ctx.font = 'bold 16px Orbitron, monospace';
   ctx.textAlign = 'center';
   ctx.fillText(currency + total.toFixed(0), cx, cy - 4);
-  ctx.font = '10px Outfit';
+  ctx.font = '11px Outfit, sans-serif';
   ctx.fillStyle = getThemeColor(0.45);
-  ctx.fillText('total expenses', cx, cy + 14);
+  ctx.fillText(t('totalExpenses'), cx, cy + 14);
 
   // Legend
   if (legend) {
@@ -806,16 +1372,18 @@ function drawDonut() {
   // Insight
   if (insight && entries.length) {
     const biggest = entries.reduce((a,b) => a.value > b.value ? a : b);
-    insight.innerHTML = `🏆 Biggest spend: <strong>${biggest.label}</strong> — ${currency}${biggest.value.toFixed(2)} (${((biggest.value/total)*100).toFixed(1)}%)`;
+    insight.innerHTML = `★ ${t('biggestSpend')}: <strong>${biggest.label}</strong> — ${currency}${biggest.value.toFixed(2)} (${((biggest.value/total)*100).toFixed(1)}%)`;
   }
 }
 
 function drawBar() {
   const canvas = $('barChart');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  const ctx = setupHiDPICanvas(canvas);
+  const W = canvas._logicalW, H = canvas._logicalH;
   ctx.clearRect(0,0,W,H);
+  ctx.imageSmoothingEnabled = true;
+  ctx.textBaseline = 'alphabetic';
 
   // Last 6 months
   const months = [];
@@ -847,7 +1415,7 @@ function drawBar() {
     const y = padT + chartH - (chartH * i / 4);
     ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
     ctx.fillStyle = getThemeColor(0.35);
-    ctx.font = '9px Outfit'; ctx.textAlign = 'right';
+    ctx.font = '11px Outfit, sans-serif'; ctx.textAlign = 'right';
     ctx.fillText(currency + ((maxVal * i / 4)).toFixed(0), padL - 4, y + 3);
   }
 
@@ -883,7 +1451,7 @@ function drawBar() {
 
     // Month label
     ctx.fillStyle = getThemeColor(0.5);
-    ctx.font = '10px Outfit'; ctx.textAlign = 'center';
+    ctx.font = '11px Outfit, sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(m.label, x, H - padB + 14);
   });
 
@@ -891,34 +1459,36 @@ function drawBar() {
   ctx.fillStyle = accentColor; ctx.globalAlpha = 0.85;
   ctx.fillRect(padL, padT - 14, 10, 8);
   ctx.globalAlpha = 1;
-  ctx.fillStyle = getThemeColor(0.5); ctx.font = '10px Outfit'; ctx.textAlign = 'left';
-  ctx.fillText('Income', padL + 14, padT - 7);
+  ctx.fillStyle = getThemeColor(0.5); ctx.font = '11px Outfit, sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText(t('incomeLegend'), padL + 14, padT - 7);
   ctx.fillStyle = '#f87171'; ctx.globalAlpha = 0.85;
   ctx.fillRect(padL + 65, padT - 14, 10, 8);
   ctx.globalAlpha = 1;
   ctx.fillStyle = getThemeColor(0.5);
-  ctx.fillText('Expense', padL + 79, padT - 7);
+  ctx.fillText(t('expenseLegend'), padL + 79, padT - 7);
 
   // Insight
   const insight = $('barInsight');
   if (insight) {
-    const bestLabel = bestMonthIncome.income > 0 ? `🏆 Best income: <strong>${bestMonthIncome.label}</strong> (${currency}${bestMonthIncome.income.toFixed(0)})` : '';
-    const worstLabel = worstMonthExpense.expense > 0 ? `📉 Highest spend: <strong>${worstMonthExpense.label}</strong> (${currency}${worstMonthExpense.expense.toFixed(0)})` : '';
-    insight.innerHTML = [bestLabel, worstLabel].filter(Boolean).join(' &nbsp;·&nbsp; ') || 'Add transactions to see monthly trends.';
+    const bestLabel  = bestMonthIncome.income   > 0 ? `★ ${t('bestIncome')}: <strong>${bestMonthIncome.label}</strong> (${currency}${bestMonthIncome.income.toFixed(0)})` : '';
+    const worstLabel = worstMonthExpense.expense> 0 ? `▼ ${t('highestSpend')}: <strong>${worstMonthExpense.label}</strong> (${currency}${worstMonthExpense.expense.toFixed(0)})` : '';
+    insight.innerHTML = [bestLabel, worstLabel].filter(Boolean).join(' &nbsp;·&nbsp; ') || t('addTxForTrends');
   }
 }
 
 function drawLine() {
   const canvas = $('lineChart');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  const ctx = setupHiDPICanvas(canvas);
+  const W = canvas._logicalW, H = canvas._logicalH;
   ctx.clearRect(0,0,W,H);
+  ctx.imageSmoothingEnabled = true;
+  ctx.textBaseline = 'alphabetic';
 
   if (!transactions.length) {
     ctx.fillStyle = getThemeColor(0.35);
-    ctx.font = '13px Outfit'; ctx.textAlign = 'center';
-    ctx.fillText('Add transactions to see balance history', W/2, H/2);
+    ctx.font = '13px Outfit, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(t('addTxForHistory'), W/2, H/2);
     $('lineInsight').innerHTML = '';
     return;
   }
@@ -950,7 +1520,7 @@ function drawLine() {
     const y = padT + chartH - (chartH * i / 4);
     ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
     const val = minVal + range * i / 4;
-    ctx.fillStyle = getThemeColor(0.35); ctx.font = '9px Outfit'; ctx.textAlign = 'right';
+    ctx.fillStyle = getThemeColor(0.35); ctx.font = '11px Outfit, sans-serif'; ctx.textAlign = 'right';
     ctx.fillText(currency + val.toFixed(0), padL - 4, y + 3);
   }
 
@@ -990,7 +1560,7 @@ function drawLine() {
   const insight = $('lineInsight');
   if (insight) {
     const avg = transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0) / (transactions.filter(t=>t.type==='expense').length || 1);
-    insight.innerHTML = `💳 Avg expense: <strong>${currency}${avg.toFixed(2)}</strong> &nbsp;·&nbsp; Current balance: <strong>${currency}${balance.toFixed(2)}</strong>`;
+    insight.innerHTML = `⟶ ${t('avgExpense')}: <strong>${currency}${avg.toFixed(2)}</strong> &nbsp;·&nbsp; ${t('currentBalance')}: <strong>${currency}${balance.toFixed(2)}</strong>`;
   }
 }
 
@@ -1080,8 +1650,11 @@ function requestDelete(idx) {
   if (!t) return;
   if (settings.confirmDelete) {
     pendingDeleteIdx = idx;
-    $('confirmDeleteText').textContent =
-      `Delete "${t.name}" (${t.type==='income'?'+':'-'}${currency}${t.amount.toFixed(2)})? This cannot be undone.`;
+    $('confirmDeleteText').textContent = t('deleteConfirmText')
+        .replace('{name}', t.name)
+        .replace('{sign}', t.type==='income'?'+':'-')
+        .replace('{currency}', currency)
+        .replace('{amount}', t.amount.toFixed(2));
     $('confirmDeleteModal').style.display='flex';
   } else {
     doDelete(idx);
@@ -1219,8 +1792,12 @@ function updateSortUI() {
   ['name','amount','date','category'].forEach(f=>{
     const btn = $(`sb-${f}`); const arr = $(`sarr-${f}`);
     if (!btn||!arr) return;
-    btn.classList.toggle('active-sort', f===sortField);
-    arr.textContent = f===sortField ? (sortDir==='asc'?'▲':'▼') : '';
+    const isActive = f === sortField;
+    btn.classList.toggle('active-sort', isActive);
+    btn.classList.toggle('sort-asc',  isActive && sortDir === 'asc');
+    btn.classList.toggle('sort-desc', isActive && sortDir === 'desc');
+    btn.setAttribute('aria-sort', isActive ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none');
+    arr.textContent = isActive ? (sortDir === 'asc' ? '↑' : '↓') : '';
   });
 }
 
@@ -1245,18 +1822,18 @@ function clearFilters() {
 function changeCurrency(sym, label, code) {
   if (code===currencyCode) return;
   pendingCurrency=sym; pendingCurrLabel=label; pendingCurrCode=code;
-  $('convertText').textContent=`You're switching from ${currencyCode} to ${code}. Do you want to convert your existing values using today's live exchange rate?`;
-  $('rateInfo').textContent='Fetching live rate…';
+  $('convertText').textContent=t('currencySwitchPrompt').replace('{from}',currencyCode).replace('{to}',code);
+  $('rateInfo').textContent=t('fetchingRate');
   $('convertBtn').disabled=true;
   $('currencyConvertModal').style.display='flex';
   fetchRate(currencyCode, code)
     .then(rate => {
       pendingRate = rate;
-      $('rateInfo').innerHTML=`<strong>1 ${currencyCode} = ${rate.toFixed(4)} ${code}</strong><br>Live rate via Open Exchange Rates`;
+      $('rateInfo').innerHTML=`<strong>1 ${currencyCode} = ${rate.toFixed(4)} ${code}</strong><br>${t('liveRateVia')}`;
       $('convertBtn').disabled=false;
     })
     .catch(()=>{
-      $('rateInfo').textContent='Could not fetch live rate. You can still switch currencies without converting.';
+      $('rateInfo').textContent=t('cantFetchRate');
       $('convertBtn').disabled=true;
     });
 }
@@ -1265,6 +1842,19 @@ function applyCurrencyChange(doConvert) {
   if (doConvert && pendingRate) {
     balance = parseFloat((balance * pendingRate).toFixed(2));
     transactions = transactions.map(t=>({...t, amount: parseFloat((t.amount * pendingRate).toFixed(2))}));
+    // Also convert quick (predefined) transaction amounts
+    predefinedTransactions = predefinedTransactions.map(p => ({
+      ...p,
+      amount: parseFloat((parseFloat(p.amount) * pendingRate).toFixed(2))
+    }));
+    // Convert savings goal target (stored in the goal input)
+    const goalInput = $('goal');
+    if (goalInput) {
+      const gv = parseFloat(goalInput.value);
+      if (!isNaN(gv) && gv > 0) {
+        goalInput.value = parseFloat((gv * pendingRate).toFixed(2));
+      }
+    }
   }
   currency=pendingCurrency; currencyLabel=pendingCurrLabel; currencyCode=pendingCurrCode;
   pendingCurrency=pendingCurrLabel=pendingCurrCode=pendingRate=null;
@@ -1340,10 +1930,10 @@ async function runConvert() {
       const result = amount * rate;
       resultNum.textContent = result.toLocaleString('en-US', {maximumFractionDigits: 4}) + ' ' + to;
       resultRate.textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
-      updated.textContent = 'Live rate via frankfurter.app';
+      updated.textContent = t('liveRateFrankfurter');
     } catch {
-      resultNum.textContent = 'Unable to fetch';
-      resultRate.textContent = 'Check your connection';
+      resultNum.textContent = t('unableFetch');
+      resultRate.textContent = t('checkConnection');
       updated.textContent = '';
     }
   }, 350);
@@ -1385,6 +1975,39 @@ async function renderQuickPairs() {
   }
 }
 
+
+function copyConvResult() {
+  const num = document.getElementById('convResultNum');
+  if (!num) return;
+  const raw = (num.textContent || '').trim();
+  if (!raw || raw === '—' || raw === '…' || raw.toLowerCase().includes('unable')) return;
+  // Strip currency code suffix; keep number
+  const match = raw.match(/[-+]?[\d,]*\.?\d+/);
+  const toCopy = match ? match[0].replace(/,/g,'') : raw;
+  const done = () => {
+    const btn = document.getElementById('convCopyBtn');
+    if (btn) {
+      const prev = btn.textContent;
+      btn.textContent = '✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = prev; btn.classList.remove('copied'); }, 1400);
+    }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(toCopy).then(done).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = toCopy; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch(_) {}
+      document.body.removeChild(ta); done();
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = toCopy; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(_) {}
+    document.body.removeChild(ta); done();
+  }
+}
+
 /* ── Theme ────────────────────────────────────────────── */
 function setColor(color) {
   accentColor = color;
@@ -1398,7 +2021,7 @@ function setColor(color) {
 function toggleMode() {
   settings.darkMode = !settings.darkMode;
   document.documentElement.setAttribute('data-theme', settings.darkMode ? 'dark' : 'light');
-  $('modeBtn').textContent = settings.darkMode ? '🌙' : '☀️';
+  $('modeBtn').textContent = settings.darkMode ? '☾' : '☀';
   saveData();
   updateAnalytics();
   if (galaxyMode && settings.darkMode) startGalaxyMode(); else stopGalaxyMode();
@@ -1471,7 +2094,7 @@ function loadSong(idx) {
   updateNowPlaying();
   const player = audioEl();
   if (!player) return;
-  if (!s.src) { $('npArtist').textContent='No audio — add via + Add Your Own Song'; musicPlaying=false; return; }
+  if (!s.src) { $('npArtist').textContent=t('noAudio'); musicPlaying=false; return; }
   player.src = s.src;
   player.currentTime = s.trimStart||0;
   if (settings.musicEnabled && musicPlaying) player.play().catch(()=>{});
@@ -1480,7 +2103,7 @@ function loadSong(idx) {
 
 function updateNowPlaying() {
   const s = songs[settings.currentSong];
-  $('npTitle').textContent  = s?.title  || 'Unknown';
+  $('npTitle').textContent  = s?.title  || t('unknownSong');
   $('npArtist').textContent = s?.artist || '';
 }
 
@@ -1586,13 +2209,13 @@ function renderSongList() {
     item.innerHTML=`
       <span class="song-num">${i+1}</span>
       <span class="song-name">${escHtml(s.title)}</span>
-      ${s.custom ? '<span class="song-custom-tag">custom</span>' : ''}
-      <button class="song-play-btn" onclick="selectSong(${i})" title="Play this song">${i===settings.currentSong&&musicPlaying?'⏸':'▶'}</button>
-      <label class="toggle-switch song-toggle" title="Enable/Disable">
+      ${s.custom ? `<span class="song-custom-tag">${t('songCustomTag')}</span>` : ''}
+      <button class="song-play-btn" onclick="selectSong(${i})" title="${t('playSongTip')}">${i===settings.currentSong&&musicPlaying?'⏸':'▶'}</button>
+      <label class="toggle-switch song-toggle" title="${t('enableDisableTip')}">
         <input type="checkbox" ${s.enabled?'checked':''} onchange="toggleSongEnabled(${i},this.checked)">
         <span class="toggle-slider"></span>
       </label>
-      ${s.custom?`<button class="song-del-btn" onclick="removeSong(${i})" title="Remove">✕</button>`:''}
+      ${s.custom?`<button class="song-del-btn" onclick="removeSong(${i})" title="${t('removeTip')}">✕</button>`:''}
     `;
     sl.appendChild(item);
   });
@@ -1621,7 +2244,7 @@ function openAddSong() { $('addSongModal').style.display='flex'; }
 function closeAddSong() {
   $('addSongModal').style.display='none';
   $('songFile').value=''; $('songTitle').value='';
-  $('songFileLabel').textContent='Choose audio file…';
+  $('songFileLabel').textContent=t('chooseAudio');
   $('songTrimSection').style.display='none';
   $('trimControls').style.display='none';
   $('trimEnabled').checked=false;
@@ -1724,7 +2347,7 @@ function getAllCategories() {
 function getCategoryIcon(name) {
   const all = getAllCategories();
   const found = all.find(c => c.name === name);
-  return found ? found.emoji : '📋';
+  return found ? found.emoji : '◈';
 }
 
 function populateCategorySelects() {
@@ -1743,14 +2366,14 @@ function renderCustomCatList() {
   const list = $('customCatList');
   if (!list) return;
   if (!customCategories.length) {
-    list.innerHTML = '<div class="setting-desc" style="padding:6px 0">No custom categories yet.</div>';
+    list.innerHTML = `<div class="setting-desc" style="padding:6px 0">${t('noCustomCats')}</div>`;
     return;
   }
   list.innerHTML = customCategories.map((c, i) => `
     <div class="predefined-mgmt-item">
       <span class="predefined-mgmt-icon">${c.emoji}</span>
       <span class="predefined-mgmt-name">${escHtml(c.name)}</span>
-      <button class="song-del-btn" onclick="deleteCustomCategory(${i})" title="Delete">✕</button>
+      <button class="song-del-btn" onclick="deleteCustomCategory(${i})" title="${t('deleteTip')}">✕</button>
     </div>
   `).join('');
 }
@@ -1766,7 +2389,7 @@ function closeAddCustomCategory() {
 }
 
 function addCustomCategory() {
-  const emoji = ($('newCatEmoji')?.value.trim()) || '🏷';
+  const emoji = ($('newCatEmoji')?.value.trim()) || '◆';
   const name  = $('newCatName')?.value.trim();
   if (!name) { shakeEl($('newCatName')); return; }
   if (getAllCategories().find(c => c.name.toLowerCase() === name.toLowerCase())) {
@@ -1813,18 +2436,23 @@ function renderPredefined() {
 function applyPredefined(idx) {
   const p = predefinedTransactions[idx];
   if (!p) return;
-  populateCategorySelects();
-  $('txName').value   = p.name;
-  $('txAmount').value = p.amount;
-  $('txNote').value   = p.note || '';
-  $('txCategory').value = p.category || 'General';
-  setType(p.type);
-  $('editIdx').value  = '';
-  if ($('txPredefined')) $('txPredefined').checked = false;
-  $('addModalTitle').textContent = t('newTx');
-  $('addBtn').textContent = t('add');
-  $('addMenu').style.display = 'flex';
-  setTimeout(() => $('txName').focus(), 120);
+  // Directly add the transaction — no modal
+  const amt = parseFloat(p.amount);
+  if (isNaN(amt) || amt <= 0) return;
+  if (p.type === 'income') balance += amt;
+  else                     balance -= amt;
+  transactions.push({
+    name: p.name,
+    amount: amt,
+    type: p.type,
+    category: p.category || 'General',
+    note: p.note || '',
+    createdAt: new Date().toISOString()
+  });
+  saveData();
+  updateUI();
+  if (typeof flashBalance === 'function') flashBalance(p.type);
+  if (typeof showToast === 'function') showToast(`${t('added')||'Added'}: ${p.name}`);
 }
 
 function renderPredefinedMgmt() {
@@ -1844,7 +2472,7 @@ function renderPredefinedMgmt() {
         <span class="predefined-mgmt-name">${escHtml(p.name)}</span>
         <span class="predefined-mgmt-meta ${p.type}">${p.type==='income'?'+':'-'}${currency}${parseFloat(p.amount).toFixed(2)} · ${escHtml(p.category)}</span>
       </div>
-      <button class="song-del-btn" onclick="deletePredefined(${i})" title="Remove">✕</button>
+      <button class="song-del-btn" onclick="deletePredefined(${i})" title="${t('removeTip')}">✕</button>
     </div>
   `).join('');
 }
@@ -1864,6 +2492,7 @@ function toggleGalaxyMode(on) {
 }
 
 function startGalaxyMode() {
+  document.body.classList.add('galaxy-mode');
   if (galaxyCanvas) return; // already running
   galaxyCanvas = document.createElement('canvas');
   galaxyCanvas.id = 'galaxyCanvas';
@@ -1874,6 +2503,7 @@ function startGalaxyMode() {
 }
 
 function stopGalaxyMode() {
+  document.body.classList.remove('galaxy-mode');
   if (!galaxyCanvas) return;
   galaxyCanvas.style.opacity = '0';
   setTimeout(() => {
@@ -2020,3 +2650,19 @@ renderPredefined();
 ['addCustomCategoryModal'].forEach(id=>{
   const el=$(id); if(el) el.addEventListener('click',e=>{ if(e.target===el) el.style.display='none'; });
 });
+
+/* ── Experimental Themes ──────────────────────────────────
+   Off by default. Switches body[data-exp-theme] which is
+   styled by experimental-themes.css. */
+function applyExperimentalTheme(name) {
+  const valid = ['off','mono','cumulus','ledger','prism'];
+  const v = valid.includes(name) ? name : 'off';
+  if (v === 'off') document.body.removeAttribute('data-exp-theme');
+  else document.body.setAttribute('data-exp-theme', v);
+}
+function setExperimentalTheme(name) {
+  settings.experimentalTheme = name;
+  applyExperimentalTheme(name);
+  saveData();
+}
+

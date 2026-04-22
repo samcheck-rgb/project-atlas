@@ -163,6 +163,7 @@ header {
 .btn.sm-btn { padding: 6px 12px; font-size: 0.8rem; }
 .hdr-btn { padding: 7px 12px; font-size: 0.8rem; }
 .icon-btn { width: 34px; padding: 7px; text-align: center; }
+.ldm-btn {width: 55px ; padding: 7px 12px; font-size: 0.8rem;}
 
 /* ─── Dropdown ──────────────────────────────────── */
 .dropdown { position: relative; }
@@ -440,10 +441,32 @@ select option { background: #0d1628; color: var(--text); }
   padding: 5px 10px; border: 1px solid var(--border); border-radius: 8px;
   background: var(--card); color: var(--muted); cursor: pointer;
   font-family: 'Outfit', sans-serif; font-size: 0.78rem; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 6px;
 }
 .sort-btn:hover { border-color: var(--accent); color: var(--accent); }
-.sort-btn.active-sort { border-color: var(--accent); color: var(--accent); background: rgba(74,222,128,0.08); }
-.sort-arrow { font-size: 0.65rem; margin-left: 3px; }
+.sort-btn.active-sort {
+  border-color: var(--accent);
+  color: #0a0f0c;
+  background: var(--accent);
+  font-weight: 700;
+  box-shadow: 0 0 0 1px var(--accent), 0 4px 14px -4px var(--accent);
+}
+.sort-btn.active-sort:hover { color: #0a0f0c; }
+.sort-arrow {
+  font-size: 0.85rem;
+  line-height: 1;
+  margin-left: 2px;
+  display: inline-block;
+  min-width: 10px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+.sort-btn.active-sort .sort-arrow {
+  font-weight: 900;
+  text-shadow: 0 0 6px rgba(0,0,0,0.25);
+}
+.sort-btn.active-sort.sort-asc  .sort-arrow { transform: translateY(-1px); }
+.sort-btn.active-sort.sort-desc .sort-arrow { transform: translateY(1px); }
 .three-dot { font-size: 1.1rem; font-weight: 700; padding: 4px 9px; }
 .three-dot-dd { position: relative; }
 .three-dot-dd .dropdown-content {
@@ -644,13 +667,17 @@ body.liquid-glass[data-theme="light"] .setting-name {
 body.liquid-glass[data-theme="light"] .setting-desc {
   color: #374151 !important;
 }
-body.liquid-glass .sort-btn,
+body.liquid-glass .sort-btn:not(.active-sort),
 body.liquid-glass .filter-opt {
   color: rgba(255,255,255,0.9) !important;
 }
-body.liquid-glass[data-theme="light"] .sort-btn,
+body.liquid-glass[data-theme="light"] .sort-btn:not(.active-sort),
 body.liquid-glass[data-theme="light"] .filter-opt {
   color: #1a202c !important;
+}
+body.liquid-glass .sort-btn.active-sort,
+body.liquid-glass[data-theme="light"] .sort-btn.active-sort {
+  color: #0a0f0c !important;
 }
 
 /* Light mode + Liquid Glass → glow box for setting names */
@@ -757,4 +784,234 @@ body.liquid-glass[data-theme="light"] .filter-opt {
 }
 @media (max-width: 400px) {
   .predefined-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+
+/* ═══ Project Atlas — updates (vertical filter, sharp charts, galaxy glows, scrollbar, clickable buttons, themes) ═══ */
+
+/* Canvas base — CSS-size driven, DPR handled in JS */
+#donutChart { width: 260px; max-width: 100%; height: 260px; }
+#barChart, #lineChart { width: 100%; height: 220px; display: block; }
+
+/* Ensure clicks never get blocked by inner spans / icons of any button.
+   Every descendant of a <button> is click-through so the <button>
+   itself always receives the pointer event. */
+button, button * { cursor: pointer; }
+button > *,
+.btn > *, .fab > *, .fab-secondary > *, .music-btn > *, .type-btn > *,
+.atab > *, .sort-btn > *, .loop-btn > *, .modal-close > *,
+.predefined-tile > *, .quick-pair-card > *, .conv-copy-btn > * {
+  pointer-events: none;
+}
+/* Edit/Add Transaction modal must sit ABOVE the All-Transactions full modal */
+#addMenu { z-index: 1200 !important; }
+#confirmDeleteModal, #confirmClearModal { z-index: 1300 !important; }
+
+/* Hide scrollbars on the right side of scrollable regions (keep scroll functionality) */
+html, body,
+.full-modal-content,
+.full-tx-list,
+.modal-content,
+.three-dot-dd .dropdown-content,
+.song-list,
+.custom-cat-list,
+.predefined-mgmt-list {
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* IE/old Edge */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.full-modal-content::-webkit-scrollbar,
+.full-tx-list::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar,
+.three-dot-dd .dropdown-content::-webkit-scrollbar,
+.song-list::-webkit-scrollbar,
+.custom-cat-list::-webkit-scrollbar,
+.predefined-mgmt-list::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* ─── Filter menu: VERTICAL, wider, one-line category names ─── */
+.three-dot-dd .dropdown-content.filter-panel {
+  min-width: 260px;
+  max-width: 300px;
+  max-height: 420px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.filter-panel .filter-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 6px;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.filter-panel .filter-opt > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.filter-panel #catFilterList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.filter-panel #catFilterList .filter-opt {
+  padding: 6px 6px;
+}
+.filter-panel .filter-section-title {
+  font-size: 0.7rem;
+  margin: 10px 0 4px;
+}
+
+/* ─── Currency Converter: mobile layout & copy button ─── */
+.converter-result { position: relative; padding-right: 46px; }
+.conv-copy-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.conv-copy-btn:hover {
+  background: var(--accent); color: #000; border-color: var(--accent);
+  transform: scale(1.06);
+}
+.conv-copy-btn.copied {
+  background: var(--accent); color: #000; border-color: var(--accent);
+}
+
+/* On phones: stack converter fields vertically, swap button full width, no cramped wrap */
+@media (max-width: 600px) {
+  .converter-content { max-width: 100%; }
+  .converter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .converter-field { width: 100%; min-width: 0; flex: 1 1 auto; }
+  .converter-field select, .converter-field input { width: 100%; }
+  .swap-btn {
+    order: 3;
+    width: 100%;
+    height: 40px;
+    align-self: stretch;
+    margin: 0;
+    border-radius: 10px;
+  }
+  .swap-btn:hover { transform: none; }
+  .quick-pairs-grid { grid-template-columns: repeat(2, 1fr); }
+  .converter-result { padding: 18px 48px 18px 14px; }
+  .conv-number { font-size: clamp(1.25rem, 6vw, 1.8rem); word-break: break-word; }
+}
+
+/* ─── Light + Liquid Glass: song list brightness (was too dark) ─── */
+body.liquid-glass .song-name,
+body.liquid-glass .np-title {
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.55);
+  font-weight: 500;
+}
+body.liquid-glass .np-artist,
+body.liquid-glass .song-num,
+body.liquid-glass .time-lbl {
+  color: rgba(255,255,255,0.8) !important;
+}
+body.liquid-glass[data-theme="light"] .song-name,
+body.liquid-glass[data-theme="light"] .np-title {
+  color: #0d1628 !important;
+  text-shadow: 0 1px 3px rgba(255,255,255,0.75);
+  font-weight: 600;
+}
+body.liquid-glass[data-theme="light"] .np-artist,
+body.liquid-glass[data-theme="light"] .song-num,
+body.liquid-glass[data-theme="light"] .time-lbl {
+  color: #374151 !important;
+}
+/* Also fix plain light theme song names */
+[data-theme="light"] .song-name { color: #0d1628; }
+[data-theme="light"] .np-title { color: #0d1628; }
+[data-theme="light"] .song-num { color: #475569; }
+
+/* ─── Galaxy Mode: extra glows & beauty ─── */
+body.galaxy-mode {
+  background:
+    radial-gradient(ellipse at 20% 15%, rgba(167,139,250,0.18), transparent 55%),
+    radial-gradient(ellipse at 80% 85%, rgba(56,189,248,0.16), transparent 60%),
+    radial-gradient(ellipse at 50% 50%, rgba(244,114,182,0.10), transparent 70%),
+    #030617;
+}
+body.galaxy-mode .card {
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(167,139,250,0.08),
+    inset 0 0 20px rgba(167,139,250,0.03);
+}
+body.galaxy-mode .balance-card {
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.6),
+    0 0 36px rgba(74,222,128,0.15),
+    inset 0 0 30px rgba(74,222,128,0.06);
+}
+body.galaxy-mode .balance-card::before {
+  background: radial-gradient(ellipse at center,
+    rgba(167,139,250,0.14), rgba(56,189,248,0.06) 40%, transparent 70%);
+  filter: blur(14px);
+}
+body.galaxy-mode .fab {
+  box-shadow:
+    0 8px 28px rgba(74,222,128,0.55),
+    0 0 40px rgba(167,139,250,0.35);
+}
+body.galaxy-mode header {
+  background: rgba(3,6,23,0.55);
+  box-shadow: 0 1px 0 rgba(167,139,250,0.18), 0 8px 30px rgba(0,0,0,0.5);
+}
+body.galaxy-mode .logo { text-shadow: 0 0 20px rgba(167,139,250,0.5); }
+body.galaxy-mode .modal-content {
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.7),
+    0 0 0 1px rgba(167,139,250,0.12),
+    0 0 60px rgba(56,189,248,0.1);
+}
+
+/* ─── Small icon spans used instead of emojis ─── */
+.stg-ico, .btn-ico, .warn-ico {
+  display: inline-block;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 2px;
+}
+.warn-ico {
+  color: #f87171;
+  width: 20px; height: 20px; line-height: 18px;
+  border: 2px solid #f87171;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 0.8rem;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Predefined tile icon as glyph, larger & clean */
+.predefined-tile-icon,
+.predefined-mgmt-icon,
+.t-icon {
+  font-family: 'Orbitron', monospace;
+  font-weight: 600;
 }

@@ -936,6 +936,8 @@ const TRANSLATIONS = {
     added:'Tillagd',
 
     about_engine:'MOTOR',
+    about_record:'Hur spelar du in?',
+    about_question:'Question: ',
     about_label:'PROJEKT',
     about_author:'Författare',
     about_hosted:'Hostad på',

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas Lite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="lite.css">
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-content">
+    <div class="loader-title">ATLAS Lite</div>
+    <div class="loader-subtitle">Budget Control System · Lite</div>
+    <div class="loader-bar-wrap"><div class="loader-bar-fill" id="loaderFill"></div></div>
+    <div class="loader-pct" id="loaderPct">0%</div>
+  </div>
+</div>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- UNDO TOAST -->
+<div id="undoToast" class="undo-toast">
+  <span id="undoMsg">Transaction deleted</span>
+  <button onclick="undoDelete()">Undo</button>
+  <div class="undo-progress" id="undoProgress"></div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="logo"><span class="logo-icon">◈</span><span class="logo-text">ATLAS LITE</span></div>
+    <div class="header-controls">
+      <div class="dropdown">
+        <button class="btn hdr-btn"><span id="currencyLabel">USD $</span> ▾</button>
+        <div class="dropdown-content">
+          <div onclick="changeCurrency('$','USD $','USD')">🇺🇸 USD ($)</div>
+          <div onclick="changeCurrency('€','EUR €','EUR')">🇪🇺 EUR (€)</div>
+          <div onclick="changeCurrency('£','GBP £','GBP')">🇬🇧 GBP (£)</div>
+          <div onclick="changeCurrency('₺','TRY ₺','TRY')">🇹🇷 TRY (₺)</div>
+          <div onclick="changeCurrency('¥','JPY ¥','JPY')">🇯🇵 JPY (¥)</div>
+          <div onclick="changeCurrency('₹','INR ₹','INR')">🇮🇳 INR (₹)</div>
+        </div>
+      </div>
+      <button class="btn hdr-btn icon-btn" id="modeBtn" onclick="toggleMode()" data-i18n-title="lightDarkTip" title="Light/Dark Mode">☾</button>
+      <button class="btn ldm-btn icon-btn" onclick="window.location.href='index.html'" data-i18n="fullBtn">Full</button>
+      <button class="btn hdr-btn icon-btn" onclick="openSettings()" data-i18n-title="settingsTip" title="Settings">⚙</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- BALANCE CARD -->
+    <div class="card balance-card" id="balanceCard">
+      <div class="balance-label" data-i18n="totalBalance">TOTAL BALANCE</div>
+      <h2 class="balance-amount"><span id="balanceSign"></span><span id="currencyDisp">$</span><span id="balance">0.00</span></h2>
+      <div class="balance-meta">
+        <span id="mainDatetime" class="main-dt"></span>
+        <span class="balance-stats">
+          <span class="income-stat">↑ <span id="totalIncome">0.00</span></span>
+          <span class="expense-stat">↓ <span id="totalExpense">0.00</span></span>
+        </span>
+      </div>
+    </div>
+
+    <!-- SAVING GOAL -->
+    <div class="card">
+      <h3 data-i18n="savingGoal">Saving Goal</h3>
+      <div class="goal-row">
+        <input id="goal" type="number" placeholder="Set target amount" data-i18n-placeholder="phGoal" oninput="updateProgress()">
+        <span class="goal-currency" id="goalCurrency">$</span>
+      </div>
+      <div class="progress" id="progress"><span>0%</span></div>
+      <div class="progress-label" id="progressLabel" data-i18n="setGoal">Set a goal to track your progress</div>
+    </div>
+
+    <!-- PREDEFINED TRANSACTIONS -->
+    <div class="card" id="predefinedCard">
+      <div class="transactions-header">
+        <h3><span class="stg-ico">»</span> QUICK TRANSACTIONS</h3>
+        <span class="predefined-count" id="predefinedCount"></span>
+      </div>
+      <div id="predefinedGrid" class="predefined-grid"></div>
+      <div id="predefinedEmpty" class="empty-state" style="display:none">
+        <div class="empty-illustration">»</div>
+        <span>No quick transactions yet. Mark a transaction as predefined when adding.</span>
+      </div>
+    </div>
+
+    <!-- RECENT TRANSACTIONS -->
+    <div class="card" id="txPreviewCard">
+      <div class="transactions-header">
+        <h3 data-i18n="recentTx">Recent Transactions</h3>
+        <button class="btn sm-btn" onclick="openTransactionsFull()" data-i18n="viewAll">View All →</button>
+      </div>
+      <div id="content"></div>
+      <div id="emptyState" class="empty-state">
+        <div class="empty-illustration">◈</div>
+        <span data-i18n="noTx">No transactions yet. Tap <b>+</b> to add one.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT SECTION -->
+  <div id="aboutSection" class="about-section">
+    <div class="about-line"><span class="about-label">PROJECT</span> <span class="about-highlight">ATLAS</span></div>
+    <div class="about-line"><span class="about-engine">ENGINE</span> <span class="about-highlight">ATLAS LITE</span></div>
+    <div class="about-line"><span class="about-label">Author</span> <span class="about-author">Sam Roohi</span></div>
+    <div class="about-line"><span class="about-label">Hosted on</span> <span class="about-muted">Cloudflare Servers</span></div>
+    <div class="about-line"><span class="about-label">Candidate for</span> <span class="about-highlight">1W1I</span></div>
+    <div class="about-line"><span class="about-label">Directed by</span> <span class="about-highlight">AIOLEARN</span> <span class="about-muted">Academy</span></div>
+  </div>
+
+  <!-- FAB GROUP -->
+  <div class="fab-group">
+    <button class="fab fab-secondary" onclick="openConverter()" title="Currency Converter">⇄</button>
+    <button class="fab" onclick="openAdd()" title="Add Transaction">+</button>
+  </div>
+</div>
+
+<!-- ═══ ADD / EDIT TRANSACTION MODAL ═══ -->
+<div id="addMenu" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="addModalTitle" data-i18n="newTx">New Transaction</h3>
+      <button class="modal-close" onclick="closeAdd()">✕</button>
+    </div>
+    <div class="field"><label data-i18n="name">Name</label><input id="txName" placeholder="e.g. Grocery shopping" data-i18n-placeholder="phName"></div>
+    <div class="field"><label data-i18n="amount">Amount</label><input id="txAmount" type="number" placeholder="0.00" min="0" step="0.01" data-i18n-placeholder="phAmount"></div>
+    <div class="field">
+      <label data-i18n="category">Category</label>
+      <div class="category-row">
+        <select id="txCategory"></select>
+        <button type="button" class="btn sm-btn" onclick="openAddCustomCategory()" title="Add custom category" style="flex-shrink:0;padding:8px 10px;">+</button>
+      </div>
+    </div>
+    <div class="field"><label data-i18n="note">Note <span class="opt-label" data-i18n="optional">(optional)</span></label><textarea id="txNote" placeholder="Add a note…" data-i18n-placeholder="phNote" rows="2"></textarea></div>
+    <div class="field predefined-field">
+      <label class="predefined-check-label">
+        <input type="checkbox" id="txPredefined">
+        <span class="predefined-check-text"><span class="stg-ico">»</span> Save as Quick Transaction</span>
+      </label>
+      <div class="setting-desc" style="margin-top:4px;padding-left:22px">Adds this to your Quick Transactions panel for fast reuse</div>
+    </div>
+    <div class="field">
+      <label data-i18n="type">Type</label>
+      <div class="type-toggle">
+        <button class="type-btn active" id="incomeBtn" onclick="setType('income')" data-i18n="income">↑ Income</button>
+        <button class="type-btn" id="expenseBtn" onclick="setType('expense')" data-i18n="expense">↓ Expense</button>
+      </div>
+    </div>
+    <input type="hidden" id="txType" value="income">
+    <input type="hidden" id="editIdx" value="">
+    <div class="modal-actions">
+      <button class="btn danger" onclick="closeAdd()" data-i18n="cancel">Cancel</button>
+      <button class="btn primary" id="addBtn" onclick="addTransaction()" data-i18n="add">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FULL TRANSACTIONS MODAL ═══ -->
+<div id="transactionsFull" class="modal full-modal">
+  <div class="modal-content full-modal-content">
+    <div class="modal-header">
+      <h3 data-i18n="allTx">All Transactions</h3>
+      <div class="modal-header-actions">
+        <button class="btn sm-btn danger-outline" onclick="confirmClearAll()"><span class="btn-ico">✕</span> <span data-i18n="clearAll">Clear All</span></button>
+        <button class="modal-close" onclick="closeTransactionsFull()">✕</button>
+      </div>
+    </div>
+    <div class="search-bar-wrap">
+      <span class="search-icon-outer">⌕</span>
+      <input type="text" id="txSearch" placeholder="Search transactions…" oninput="renderFullTransactions()" data-i18n-placeholder="searchTx">
+    </div>
+    <div class="sort-bar">
+      <span class="sort-label" data-i18n="sort">Sort:</span>
+      <button class="sort-btn" id="sb-name" onclick="toggleSort('name')" data-i18n="sortName">Name <span id="sarr-name" class="sort-arrow"></span></button>
+      <button class="sort-btn" id="sb-amount" onclick="toggleSort('amount')" data-i18n="sortAmount">Amount <span id="sarr-amount" class="sort-arrow"></span></button>
+      <button class="sort-btn active-sort sort-desc" id="sb-date" onclick="toggleSort('date')" data-i18n="sortDate" aria-sort="descending">Date <span id="sarr-date" class="sort-arrow">↓</span></button>
+      <button class="sort-btn" id="sb-category" onclick="toggleSort('category')" data-i18n="sortCat">Category <span id="sarr-category" class="sort-arrow"></span></button>
+      <div class="dropdown three-dot-dd">
+        <button class="sort-btn three-dot" title="Filter">⋮</button>
+        <div class="dropdown-content filter-panel">
+          <div class="filter-section-title" data-i18n="type">Type</div>
+          <label class="filter-opt"><input type="checkbox" id="fltIncome" onchange="applyFilters()"> <span data-i18n="income">Income</span></label>
+          <label class="filter-opt"><input type="checkbox" id="fltExpense" onchange="applyFilters()"> <span data-i18n="expense">Expense</span></label>
+          <div class="filter-section-title" data-i18n="category">Category</div>
+          <div id="catFilterList"></div>
+          <button class="btn sm-btn" style="margin-top:8px;width:100%" onclick="clearFilters()" data-i18n="clearFilters">Clear Filters</button>
+        </div>
+      </div>
+    </div>
+    <div id="fullContent" class="full-tx-list"></div>
+    <div id="fullEmpty" class="empty-state" style="display:none" data-i18n="noMatch">No transactions match your filters.</div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div id="settingsMenu" class="modal">
+  <div class="modal-content settings-content">
+    <div class="modal-header"><h3>⚙ <span data-i18n="settings">Settings</span></h3><button class="modal-close" onclick="closeSettings()">✕</button></div>
+    <div class="settings-body">
+
+      <div class="settings-section">
+        <div class="settings-section-title" data-i18n="general">General</div>
+        <div class="setting-row">
+          <div><div class="setting-name" data-i18n="confirmDelete">Confirm Delete</div><div class="setting-desc" data-i18n="confirmDeleteDesc">Ask before deleting a transaction</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="stgConfirmDelete" checked onchange="saveSetting('confirmDelete',this.checked)"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-name" data-i18n="tsFormat">Timestamp Format</div><div class="setting-desc" data-i18n="tsFormatDesc">Shown on each transaction</div></div>
+          <select class="setting-select" id="stgTsFormat" onchange="saveSetting('tsFormat',this.value);renderTransactions()">
+            <option value="datetime" data-i18n="dateTime">Date &amp; Time</option>
+            <option value="date" data-i18n="dateOnly">Date Only</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-name" data-i18n="maxShown">Recent Transactions Shown</div><div class="setting-desc" data-i18n="maxShownDesc">Visible on main screen (5–20)</div></div>
+          <div class="range-with-val">
+            <input type="range" id="stgMaxShown" class="range-input" min="5" max="20" value="5"
+              oninput="document.getElementById('maxShownVal').textContent=this.value;saveSetting('maxShown',+this.value);renderTransactions()">
+            <span class="range-val" id="maxShownVal">5</span>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-name" data-i18n="language">Language</div><div class="setting-desc" data-i18n="languageDesc">App interface language</div></div>
+          <select class="setting-select" id="stgLanguage" onchange="changeLanguage(this.value)">
+            <option value="en">🇬🇧 English</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="ru">🇷🇺 Русский</option>
+            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="fa">🇮🇷 فارسی</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- CUSTOM CATEGORIES -->
+      <div class="settings-section">
+        <div class="settings-section-title"><span class="stg-ico">≡</span> <span data-i18n="customCategories">Custom Categories</span></div>
+        <div id="customCatList" class="custom-cat-list"></div>
+        <button class="btn sm-btn primary" style="margin-top:10px;width:100%" onclick="openAddCustomCategory()" data-i18n="addCustomCategory">+ Add Custom Category</button>
+      </div>
+
+      <!-- QUICK TRANSACTIONS MANAGEMENT -->
+      <div class="settings-section">
+        <div class="settings-section-title"><span class="stg-ico">»</span> <span data-i18n="quickTransactions">Quick Transactions</span></div>
+        <div class="setting-desc" style="margin-bottom:12px"><span data-i18n="quickTxManageDesc">Manage your saved quick transactions (max</span> <span id="maxPredefinedLabel">16</span>)</div>
+        <div id="predefinedMgmtList" class="predefined-mgmt-list"></div>
+        <div id="predefinedMgmtEmpty" class="setting-desc" style="display:none;padding:8px 0" data-i18n="noQuickTxSaved">No quick transactions saved yet.</div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title" data-i18n="data">Data</div>
+        <div class="data-btns">
+          <button class="btn primary" onclick="exportData()" data-i18n="exportData">↑ Export Data</button>
+          <label class="btn" style="cursor:pointer;text-align:center"><span data-i18n="importData">↓ Import Data</span><input type="file" id="importFile" accept=".json" onchange="importData(this)" style="display:none"></label>
+        </div>
+        <div class="setting-desc" style="margin-top:8px;line-height:1.5" data-i18n="dataDesc">
+          Exports all transactions, balance, settings &amp; preferences as a .json file. Data is also saved automatically in your browser (localStorage).
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONFIRM DELETE ═══ -->
+<div id="confirmDeleteModal" class="modal mini-modal">
+  <div class="modal-content mini-content">
+    <div class="modal-header"><h3 data-i18n="deleteTx">Delete Transaction?</h3></div>
+    <p class="confirm-text" id="confirmDeleteText"></p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeConfirmDelete()" data-i18n="cancel">Cancel</button>
+      <button class="btn danger" onclick="executeDelete()" data-i18n="delete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONFIRM CLEAR ALL ═══ -->
+<div id="confirmClearModal" class="modal mini-modal">
+  <div class="modal-content mini-content">
+    <div class="modal-header"><h3><span class="warn-ico">!</span> <span data-i18n="clearAll">Clear All?</span></h3></div>
+    <p class="confirm-text" data-i18n="clearAllConfirm">This will permanently delete <strong>all</strong> transactions and reset your balance to zero. This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="document.getElementById('confirmClearModal').style.display='none'" data-i18n="cancel">Cancel</button>
+      <button class="btn danger" onclick="clearAllTransactions()" data-i18n="yesDelete">Yes, Clear All</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CURRENCY CONVERT MODAL ═══ -->
+<div id="currencyConvertModal" class="modal mini-modal">
+  <div class="modal-content mini-content">
+    <div class="modal-header"><h3 data-i18n="currencyChange">Currency Change</h3></div>
+    <p class="confirm-text" id="convertText"></p>
+    <div class="rate-info" id="rateInfo"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="applyCurrencyChange(false)" data-i18n="keepValues">Keep Values</button>
+      <button class="btn primary" id="convertBtn" onclick="applyCurrencyChange(true)" data-i18n="convert">Convert</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CURRENCY CONVERTER TOOL ═══ -->
+<div id="converterModal" class="modal">
+  <div class="modal-content converter-content">
+    <div class="modal-header">
+      <h3>⇄ <span data-i18n="currencyConverter">Currency Converter</span></h3>
+      <button class="modal-close" onclick="closeConverter()">✕</button>
+    </div>
+    <div class="converter-body">
+      <div class="converter-row">
+        <div class="converter-field">
+          <label data-i18n="amount">Amount</label>
+          <input type="number" id="convAmount" placeholder="100" value="1" oninput="runConvert()">
+        </div>
+        <div class="converter-field">
+          <label data-i18n="from">From</label>
+          <select id="convFrom" onchange="runConvert()">
+            <option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+            <option value="TRY">TRY</option><option value="JPY">JPY</option><option value="INR">INR</option>
+            <option value="CAD">CAD</option><option value="AUD">AUD</option><option value="CHF">CHF</option>
+            <option value="CNY">CNY</option><option value="BRL">BRL</option><option value="MXN">MXN</option>
+            <option value="KRW">KRW</option><option value="RUB">RUB</option><option value="SEK">SEK</option>
+            <option value="NOK">NOK</option><option value="DKK">DKK</option><option value="PLN">PLN</option>
+            <option value="SGD">SGD</option><option value="HKD">HKD</option>
+          </select>
+        </div>
+        <button class="swap-btn" onclick="swapConv()" data-i18n-title="swapCurrencies" title="Swap currencies">⇄</button>
+        <div class="converter-field">
+          <label data-i18n="to">To</label>
+          <select id="convTo" onchange="runConvert()">
+            <option value="USD">USD</option><option value="EUR" selected>EUR</option><option value="GBP">GBP</option>
+            <option value="TRY">TRY</option><option value="JPY">JPY</option><option value="INR">INR</option>
+            <option value="CAD">CAD</option><option value="AUD">AUD</option><option value="CHF">CHF</option>
+            <option value="CNY">CNY</option><option value="BRL">BRL</option><option value="MXN">MXN</option>
+            <option value="KRW">KRW</option><option value="RUB">RUB</option><option value="SEK">SEK</option>
+            <option value="NOK">NOK</option><option value="DKK">DKK</option><option value="PLN">PLN</option>
+            <option value="SGD">SGD</option><option value="HKD">HKD</option>
+          </select>
+        </div>
+      </div>
+      <div class="converter-result" id="convResult">
+        <button type="button" class="conv-copy-btn" id="convCopyBtn" onclick="copyConvResult()" data-i18n-title="copyClipboard" title="Copy to clipboard" aria-label="Copy">⧉</button>
+        <div class="conv-number" id="convResultNum">—</div>
+        <div class="conv-rate" id="convResultRate"></div>
+        <div class="conv-updated" id="convUpdated"></div>
+      </div>
+      <div class="quick-pairs">
+        <div class="quick-pairs-title" data-i18n="popularPairs">Popular Pairs</div>
+        <div class="quick-pairs-grid" id="quickPairs"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD CUSTOM CATEGORY ═══ -->
+<div id="addCustomCategoryModal" class="modal mini-modal">
+  <div class="modal-content mini-content">
+    <div class="modal-header"><h3><span class="stg-ico">≡</span> <span data-i18n="addCustomCategoryHeader">Add Custom Category</span></h3><button class="modal-close" onclick="closeAddCustomCategory()">✕</button></div>
+    <div class="field">
+      <label data-i18n="symbolLabel">Symbol</label>
+      <input id="newCatEmoji" placeholder="e.g. ◆" data-i18n-placeholder="phCatSymbol" maxlength="4" style="width:90px;display:inline-block;margin-right:8px">
+      <span style="font-size:0.75rem;color:var(--muted)" data-i18n="symbolHint">Pick a symbol (e.g. ◆ ◈ ◉ ▲ ● ♦ ✦ ✧)</span>
+    </div>
+    <div class="field">
+      <label data-i18n="categoryName">Category Name</label>
+      <input id="newCatName" placeholder="e.g. Gaming" data-i18n-placeholder="phCatName">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddCustomCategory()" data-i18n="cancel">Cancel</button>
+      <button class="btn primary" onclick="addCustomCategory()" data-i18n="addCategoryBtn">Add Category</button>
+    </div>
+  </div>
+</div>
+
+<!-- audio element kept for import compatibility (music settings in exported JSON are preserved) -->
+<audio id="audioPlayer" preload="metadata" style="display:none"></audio>
+<script src="lite.js"></script>
+</body>
+</html>

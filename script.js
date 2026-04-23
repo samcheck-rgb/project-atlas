@@ -45,8 +45,8 @@ const TRANSLATIONS = {
   
     // ── added i18n keys (full coverage) ──
     about_engine:'ENGINE',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
     about_label:'PROJECT',
     about_author:'Author',
     about_hosted:'Hosted on',
@@ -169,8 +169,8 @@ const TRANSLATIONS = {
   
     // ── added i18n keys (full coverage) ──
     about_engine:'Motor',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
     about_label:'PROYECTO',
     about_author:'Autor',
     about_hosted:'Alojado en',
@@ -291,8 +291,8 @@ const TRANSLATIONS = {
   
     // ── added i18n keys (full coverage) ──
     about_engine:'двигатель',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
     about_label:'ПРОЕКТ',
     about_author:'Автор',
     about_hosted:'Размещён на',
@@ -413,8 +413,8 @@ const TRANSLATIONS = {
   
     // ── added i18n keys (full coverage) ──
     about_engine:'Motor',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
     about_label:'PROJE',
     about_author:'Yazar',
     about_hosted:'Barındırılıyor',
@@ -535,8 +535,8 @@ const TRANSLATIONS = {
   
     // ── added i18n keys (full coverage) ──
     about_engine:'Motor',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
     about_label:'PROJEKT',
     about_author:'Autor',
     about_hosted:'Gehostet auf',
@@ -704,8 +704,8 @@ const TRANSLATIONS = {
   
     // ── added i18n keys (full coverage) ──
     about_engine:'موتور',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
     about_label:'پروژه',
     about_author:'نویسنده',
     about_hosted:'میزبانی شده در',
@@ -826,8 +826,8 @@ const TRANSLATIONS = {
       added:'Aggiunto',
 
       about_engine:'MOTORE',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
       about_label:'PROGETTO',
       about_author:'Autore',
       about_hosted:'Ospitato su',
@@ -1110,8 +1110,8 @@ const TRANSLATIONS = {
     settingsTip:'Innstillinger',
 
     liteBtn:'Lite', fullBtn:'Full',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
 
     clickExpand:'Klikk for å utvide',
     selectSongBelow:'Velg en sang nedenfor',
@@ -1209,8 +1209,8 @@ const TRANSLATIONS = {
     added:'Dodano',
 
     about_engine:'SILNIK',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
     about_label:'PROJEKT',
     about_author:'Autor',
     about_hosted:'Hostowane na',
@@ -1334,8 +1334,8 @@ const TRANSLATIONS = {
     added:'जोड़ा गया',
 
     about_engine:'इंजन',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
     about_label:'प्रोजेक्ट',
     about_author:'लेखक',
     about_hosted:'होस्ट किया गया',
@@ -1467,8 +1467,8 @@ const TRANSLATIONS = {
     addTransactionTip:'取引を追加',
     addCustomCategoryTip:'カスタムカテゴリを追加',
     filterTip:'フィルター',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
 
     galaxyMode:'ギャラクシーモード',
     galaxyModeDesc:'実験的：ダークモードで宇宙エフェクト',
@@ -1615,8 +1615,8 @@ const TRANSLATIONS = {
 
     customCategories:'Danh mục tùy chỉnh',
     addCustomCategory:'+ Thêm danh mục',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
 
     quickTransactions:'Giao dịch nhanh',
     quickTransactionsHeader:'GIAO DỊCH NHANH',
@@ -1735,8 +1735,8 @@ const TRANSLATIONS = {
     addTransactionTip:'إضافة معاملة',
     addCustomCategoryTip:'إضافة فئة',
     filterTip:'تصفية',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
 
     galaxyMode:'وضع المجرة',
     galaxyModeDesc:'تأثيرات فضائية في الوضع الداكن',
@@ -1896,8 +1896,8 @@ const TRANSLATIONS = {
     noQuickTxYet:'尚無快速交易。新增時可標記為預設。',
     saveAsQuick:'儲存為快速交易',
     saveAsQuickDesc:'加入快速面板以便快速重用',
-      about_record:'',
-      about_question:'',
+      about_record:' ',
+      about_question:' ',
 
     lightDarkTip:'淺色/深色模式',
     settingsTip:'設定',

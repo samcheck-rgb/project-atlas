@@ -937,7 +937,7 @@ const TRANSLATIONS = {
 
     about_engine:'MOTOR',
     about_record:'Hur spelar du in?',
-    about_question:'Question: ',
+    about_question:'Fråga: ',
     about_label:'PROJEKT',
     about_author:'Författare',
     about_hosted:'Hostad på',

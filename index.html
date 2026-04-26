@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="experimental-themes.css">
   <link rel="stylesheet" href="atlas-extras.css">
   <link rel="stylesheet" href="atlas-qol-extra.css">
+  <link rel="icon" type="image/png" href="atlas.png">
 </head>
 <body>
 
@@ -177,7 +178,7 @@
   <!-- ABOUT SECTION -->
   <div id="aboutSection" class="about-section">
     <div class="about-line"><span class="about-label" data-i18n="about_label">PROJECT</span> <span class="about-highlight">ATLAS</span></div>
-    <div class="about-line"><span class="about-label" data-i18n="about_engine">ENGINE</span> <span class="about-highlight">ATLAS V5.0.3</span></div>
+    <div class="about-line"><span class="about-label" data-i18n="about_engine">ENGINE</span> <span class="about-highlight">ATLAS V5.0.5</span></div>
     <div class="about-line"><span class="about-label" data-i18n="about_author">Author</span> <span class="about-author">Sam Roohi</span></div>
     <div class="about-line"><span class="about-label" data-i18n="about_hosted">Hosted on</span> <span class="about-muted">Cloudflare Servers</span></div>
     <div class="about-line"><span class="about-label" data-i18n="about_candidate">Candidate for</span> <span class="about-highlight">1W1I</span></div>
@@ -630,7 +631,7 @@
   </div>
 </div>
 
-<!-- ═══ ADD CUSTOM UI / THEME (file + name, like Add Song) ═══ -->
+<!-- ═══ ADD CUSTOM UI / THEME (file + name)═══ -->
 <div id="addCustomCssModal" class="modal mini-modal">
   <div class="modal-content mini-content">
     <div class="modal-header">
@@ -651,9 +652,14 @@
     <div class="modal-actions">
       <button class="btn" onclick="atlasCloseAddCustomCss()">Cancel</button>
       <button class="btn primary" onclick="atlasConfirmAddCustomCss()" id="addCustomCssConfirmBtn">Import</button>
+      
+      <button class="btn secondary" onclick="window.location.href='themes-gallery.html'" style="margin-top: 8px; width: 100%;">
+        Browse Themes Gallery
+      </button>
     </div>
   </div>
 </div>
+
 
 <audio id="audioPlayer" preload="metadata"></audio>
 <script src="script.js"></script>

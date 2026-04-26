@@ -1,0 +1,345 @@
+/* ═══════════════════════════════════════════════════════════
+   PROJECT ATLAS — atlas-qol-extra.css
+   Loaded LAST. Optimizes the "Bigger Settings" layout so no
+   blank space is wasted, plus styles for the new QoL features
+   (editable name, default tx type, large-tx threshold,
+   auto-backup, smart-category, today highlight, etc).
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 1. Bigger Settings — scrollable 2-column masonry menu ─ */
+body.atlas-bigger-settings #settingsMenu .settings-content {
+  max-width: min(1100px, 98vw) !important;
+  width: 98vw;
+  max-height: min(88vh, 860px);
+  padding: 18px 22px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+body.atlas-bigger-settings #settingsMenu .settings-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Keep the scroll on the outer panel. If the column layout scrolls itself,
+   browsers create extra horizontal columns and options look missing. */
+body.atlas-bigger-settings #settingsMenu .settings-body {
+  display: block !important;
+  max-height: none !important;
+  padding-right: 0 !important;
+  overflow: visible !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+body.atlas-bigger-settings #settingsMenu .settings-body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* True menu masonry: two natural columns, no rigid grid rows, no hidden items. */
+@media (min-width: 760px) {
+  body.atlas-bigger-settings #settingsMenu .settings-body {
+    column-count: 2;
+    column-gap: 14px;
+    column-fill: balance;
+  }
+}
+
+/* ── 1b. Even bigger: 3-column variant (experimental) ───── */
+@media (min-width: 1000px) {
+  body.atlas-bigger-settings.atlas-bigger-3col #settingsMenu .settings-content {
+    max-width: min(1400px, 99vw) !important;
+    width: 99vw;
+    padding: 16px 18px !important;
+  }
+  body.atlas-bigger-settings.atlas-bigger-3col #settingsMenu .settings-body {
+    column-count: 3;
+    column-gap: 12px;
+  }
+  body.atlas-bigger-settings.atlas-bigger-3col #settingsMenu .settings-section {
+    padding: 12px 13px !important;
+    margin: 0 0 12px 0 !important;
+  }
+  body.atlas-bigger-settings.atlas-bigger-3col .settings-section-title {
+    font-size: 0.88rem;
+    margin-bottom: 8px !important;
+  }
+  body.atlas-bigger-settings.atlas-bigger-3col .setting-name {
+    font-size: 0.83rem;
+  }
+  body.atlas-bigger-settings.atlas-bigger-3col .setting-desc {
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+  body.atlas-bigger-settings.atlas-bigger-3col .setting-row {
+    padding: 6px 0 !important;
+    gap: 8px;
+  }
+  /* Keep the natural masonry — don't force equal column heights */
+  body.atlas-bigger-settings.atlas-bigger-3col #settingsMenu .settings-body {
+    column-fill: balance;
+  }
+}
+
+/* ── 1c. Cap vertical stretch for tall sections so they look like
+       menu cards, not banners. Applies even without bigger-settings. */
+#atlasProfileSec .setting-row {
+  padding: 4px 0 !important;
+  gap: 4px !important;
+  margin-top: 6px !important;
+}
+#atlasProfileSec .setting-row:first-of-type { margin-top: 0 !important; }
+#atlasProfileSec .setting-name { margin: 0 !important; line-height: 1.15; }
+#atlasProfileSec .setting-desc { margin: 0 !important; line-height: 1.25; }
+#atlasProfileSec .atlas-name-row { margin-top: 2px; }
+#atlasProfileSec .atlas-name-row input,
+#atlasProfileSec .atlas-inline-num {
+  padding: 5px 8px !important;
+  font-size: 0.82rem;
+}
+#atlasProfileSec .atlas-name-row .btn {
+  padding: 5px 10px !important;
+  font-size: 0.78rem;
+  min-height: 0;
+}
+
+/* Custom UI & Theme — collapse vertical padding, tighten rows. */
+#atlasExtrasSection .setting-row,
+#atlasExtrasSection > div {
+  padding: 4px 0 !important;
+  margin: 0 !important;
+  gap: 6px !important;
+  flex-wrap: wrap;
+}
+#atlasExtrasSection .setting-name { margin: 0 !important; line-height: 1.15; }
+#atlasExtrasSection .setting-desc { margin: 0 0 2px 0 !important; line-height: 1.25; }
+
+/* Buttons fill row, wrap text so labels are never clipped. */
+#atlasExtrasSection button,
+#atlasExtrasSection .btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px !important;
+  font-size: 0.8rem;
+  white-space: normal;
+  line-height: 1.2;
+  min-height: 30px;
+  text-align: center;
+}
+#atlasExtrasSection .setting-row > button,
+#atlasExtrasSection .setting-row > .btn {
+  flex: 1 1 100%;
+}
+
+body.atlas-bigger-settings #settingsMenu .settings-section {
+  display: inline-block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 0 14px 0 !important;
+  padding: 14px 16px !important;
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 12px;
+  background: var(--card, rgba(255,255,255,0.03));
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+  vertical-align: top;
+  overflow: hidden;
+}
+
+/* Make every child inside a section respect its container width. */
+body.atlas-bigger-settings #settingsMenu .settings-section,
+body.atlas-bigger-settings #settingsMenu .settings-section * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+body.atlas-bigger-settings #settingsMenu .settings-section input,
+body.atlas-bigger-settings #settingsMenu .settings-section select,
+body.atlas-bigger-settings #settingsMenu .settings-section textarea,
+body.atlas-bigger-settings #settingsMenu .settings-section button {
+  max-width: 100%;
+}
+body.atlas-bigger-settings #settingsMenu .settings-section .setting-row {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+body.atlas-bigger-settings #settingsMenu .settings-section .setting-row > div:first-child {
+  flex: 1 1 180px;
+}
+body.atlas-bigger-settings #settingsMenu .settings-section .setting-row > select,
+body.atlas-bigger-settings #settingsMenu .settings-section .setting-row > input,
+body.atlas-bigger-settings #settingsMenu .settings-section .setting-row > button,
+body.atlas-bigger-settings #settingsMenu .settings-section .setting-row > label {
+  flex: 0 1 auto;
+}
+body.atlas-bigger-settings #settingsMenu .settings-section .setting-desc,
+body.atlas-bigger-settings #settingsMenu .settings-section .setting-name {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Tighten in-section spacing */
+body.atlas-bigger-settings .settings-section-title {
+  margin-bottom: 10px !important;
+  font-size: 0.95rem;
+}
+body.atlas-bigger-settings .setting-row {
+  padding: 8px 0 !important;
+  gap: 10px;
+}
+body.atlas-bigger-settings .setting-desc {
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+body.atlas-bigger-settings .setting-name {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 759px) {
+  body.atlas-bigger-settings #settingsMenu .settings-content {
+    width: min(96vw, 540px);
+    max-height: 88vh;
+    padding: 16px !important;
+  }
+}
+
+/* ── 2. Editable name field in settings ─────────────────── */
+.atlas-name-row { display: flex; gap: 8px; align-items: center; width: 100%; }
+.atlas-name-row input {
+  flex: 1; min-width: 0;
+  background: var(--bg2, #0d1628);
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  color: var(--text, #e5e7eb);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  outline: none;
+}
+.atlas-name-row input:focus {
+  border-color: var(--accent, #4ade80);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent, #4ade80) 20%, transparent);
+}
+.atlas-name-row .btn { padding: 7px 12px; font-size: 0.82rem; }
+
+/* ── 3. Inline number input (large-tx threshold) ────────── */
+.atlas-inline-num {
+  width: 110px;
+  background: var(--bg2, #0d1628);
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  color: var(--text, #e5e7eb);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font: inherit;
+  text-align: right;
+}
+
+/* ── 4. Today's transaction highlight ────────────────────── */
+body.atlas-today-highlight .tx-item[data-today="1"],
+body.atlas-today-highlight .transaction[data-today="1"] {
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--accent, #4ade80) 14%, transparent),
+    transparent 60%
+  ) !important;
+}
+body.atlas-today-highlight .tx-item[data-today="1"]::before,
+body.atlas-today-highlight .transaction[data-today="1"]::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 10%; bottom: 10%;
+  width: 3px;
+  background: var(--accent, #4ade80);
+  border-radius: 2px;
+}
+
+/* ── 5. Big-tx confirm modal ─────────────────────────────── */
+#atlasBigTxModal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  z-index: 100001;
+  display: none; align-items: center; justify-content: center;
+}
+#atlasBigTxModal.show { display: flex; }
+#atlasBigTxModal .btx-card {
+  background: var(--card, #161b22);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: 14px;
+  padding: 22px;
+  width: min(420px, 92vw);
+  color: var(--text, #e6edf3);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+#atlasBigTxModal h3 { margin: 0 0 8px; font-size: 1.05rem; }
+#atlasBigTxModal p { margin: 0 0 16px; color: var(--muted, #888); font-size: 0.9rem; }
+#atlasBigTxModal .btx-amt {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 6px 0 16px;
+  color: var(--accent, #4ade80);
+}
+#atlasBigTxModal .btx-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+
+/* ── 6. Settings select (default type, decimal places) ──── */
+.atlas-select {
+  background: var(--bg2, #0d1628);
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  color: var(--text, #e5e7eb);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ── 7. Compact profile / custom UI rows in bigger settings ─ */
+body.atlas-bigger-settings #atlasProfileSec .setting-row,
+body.atlas-bigger-settings #atlasExtrasSection .setting-row {
+  flex-direction: row !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+body.atlas-bigger-settings #atlasProfileSec .setting-row > div:first-child,
+body.atlas-bigger-settings #atlasExtrasSection .setting-row > div:first-child {
+  flex: 1 1 240px;
+  min-width: 220px;
+}
+body.atlas-bigger-settings #atlasProfileSec .atlas-name-row,
+body.atlas-bigger-settings #atlasExtrasSection .atlas-import-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+body.atlas-bigger-settings #atlasProfileSec .atlas-name-row input,
+body.atlas-bigger-settings #atlasProfileSec .atlas-name-row .btn,
+body.atlas-bigger-settings #atlasExtrasSection .atlas-import-row label.btn,
+body.atlas-bigger-settings #atlasExtrasSection .atlas-import-row button.btn {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+body.atlas-bigger-settings #atlasExtrasSection .atlas-import-row label.btn,
+body.atlas-bigger-settings #atlasExtrasSection .atlas-import-row button.btn {
+  text-align: center;
+}
+body.atlas-bigger-settings #atlasProfileSec .setting-desc,
+body.atlas-bigger-settings #atlasExtrasSection .setting-desc {
+  margin-top: 0;
+  line-height: 1.35;
+}
+body.atlas-bigger-settings #atlasProfileSec .setting-name,
+body.atlas-bigger-settings #atlasExtrasSection .setting-name {
+  white-space: normal;
+}

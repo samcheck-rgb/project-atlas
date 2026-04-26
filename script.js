@@ -44,6 +44,7 @@ const TRANSLATIONS = {
     added:'Added',
   
     // ── added i18n keys (full coverage) ──
+    goalLabel:'Amount',
     about_engine:'ENGINE',
       about_record:' ',
       about_question:' ',
@@ -94,6 +95,8 @@ const TRANSLATIONS = {
     endLabel:'End:',
     addSongBtn:'Add Song',
     addCustomCategoryHeader:'Add Custom Category',
+    viewCustomCategories:'View custom categories',
+    customCategoryBudgetTitle:'Custom Category Budgets',
     symbolLabel:'Symbol',
     symbolHint:'Pick a symbol (e.g. ◆ ◈ ◉ ▲ ● ♦ ✦ ✧)',
     categoryName:'Category Name',
@@ -103,6 +106,22 @@ const TRANSLATIONS = {
     editTip:'Edit',
     deleteTip:'Delete',
     removeTip:'Remove',
+    budgetSummary:'Budget Summary',
+    budgetNoLimits:'No category budgets set yet. Add them in Settings.',
+    categoryBudgetsSection:'Category Budgets',
+    categoryBudgetsDesc:'Set monthly spending limits for each category. Progress updates automatically.',
+    recurringSection:'Recurring Transactions',
+    recurringDesc:'Create entries that repeat automatically from the Add Transaction modal.',
+    deadline:'Deadline',
+    budgetExceeded:'Over budget',
+    budgetProgress:'Budget progress',
+    budgetSpent:'Spent',
+    noRecurringTx:'No recurring transactions.',
+    recurringTag:'Recurring',
+    nextDue:'Next due',
+    recurrenceWeekly:'Weekly',
+    recurrenceMonthly:'Monthly',
+    recurrenceYearly:'Yearly',
     playSongTip:'Play this song',
     enableDisableTip:'Enable/Disable',
     swapCurrencies:'Swap currencies',
@@ -2051,6 +2070,9 @@ let settings = {
   experimentalTheme: 'off', // off | mono | cumulus | ledger | prism | aurora | obsidian
   experimentalUiLayout: 'off', // off | sidebar | topbar
 };
+let categoryBudgets = {};
+let recurringTemplates = [];
+let goalDeadline = '';
 let songs = [
   { title:'Cosmic Drift',    artist:'Project Atlas', src:'music/cosmic_drift.mp3',   custom:false, enabled:true, trimStart:0, trimEnd:null },
   { title:'Nebula Wind',     artist:'Project Atlas', src:'music/nebula_wind.mp3',     custom:false, enabled:true, trimStart:0, trimEnd:null },
@@ -2118,6 +2140,9 @@ function loadData() {
     if (d.settings)      settings       = Object.assign(settings, d.settings);
     if (d.songs)         songs          = d.songs.map((s,i) => Object.assign({}, songs[i] || {}, s));
     if (d.goal)          { const g = $('goal'); if(g) g.value = d.goal; }
+    if (d.goalDeadline)  { goalDeadline = d.goalDeadline; const g = $('goalDeadline'); if (g) g.value = d.goalDeadline; }
+    if (d.categoryBudgets) categoryBudgets = d.categoryBudgets;
+    if (d.recurringTemplates) recurringTemplates = d.recurringTemplates;
     if (d.customCategories) customCategories = d.customCategories;
     if (d.predefinedTransactions) predefinedTransactions = d.predefinedTransactions;
     if (d.galaxyMode !== undefined) galaxyMode = d.galaxyMode;
@@ -2132,6 +2157,9 @@ function saveData() {
       accentColor, settings,
       songs: songs.map(s => ({ title:s.title, artist:s.artist, src: s.custom ? s.src : '', custom:s.custom, enabled:s.enabled, trimStart:s.trimStart||0, trimEnd:s.trimEnd||null })),
       goal: $('goal') ? $('goal').value : '',
+      goalDeadline,
+      categoryBudgets,
+      recurringTemplates,
       customCategories, predefinedTransactions, galaxyMode,
     }));
   } catch(e) { console.warn('saveData:', e); }
@@ -2140,6 +2168,26 @@ function saveData() {
 function saveSetting(key, val) {
   settings[key] = val;
   saveData();
+}
+
+function getGoalDeadlineBounds() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const min = new Date(today);
+  min.setDate(min.getDate() + 1);
+  const max = new Date(today);
+  max.setFullYear(max.getFullYear() + 100);
+  return { min: formatLocalDate(min), max: formatLocalDate(max) };
+}
+function isValidGoalDeadline(value) {
+  if (!value) return false;
+  const date = parseDateValue(value);
+  if (!date) return false;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const maxDate = new Date(today);
+  maxDate.setFullYear(maxDate.getFullYear() + 100);
+  return date > today && date <= maxDate;
 }
 
 /* ── Apply saved settings to UI ───────────────────────── */
@@ -2164,6 +2212,19 @@ function applySettings() {
   $('currencyLabel').setAttribute('data-symbol', currency);
   if ($('stgGalaxy')) $('stgGalaxy').checked = galaxyMode;
   if ($('maxPredefinedLabel')) $('maxPredefinedLabel').textContent = MAX_PREDEFINED;
+  const deadlineInput = $('goalDeadline');
+  if (deadlineInput) {
+    const bounds = getGoalDeadlineBounds();
+    deadlineInput.min = bounds.min;
+    deadlineInput.max = bounds.max;
+    if (goalDeadline && !isValidGoalDeadline(goalDeadline)) {
+      goalDeadline = '';
+    }
+    deadlineInput.value = goalDeadline;
+  }
+  renderCategoryBudgets();
+  renderCustomCategoryBudgets();
+  renderRecurringTemplates();
   applyTranslations();
   populateCategorySelects();
   if (galaxyMode && settings.darkMode) startGalaxyMode(); else stopGalaxyMode();
@@ -2171,6 +2232,169 @@ function applySettings() {
   if ($('stgExpTheme')) $('stgExpTheme').value = settings.experimentalTheme || 'off';
   applyExperimentalUiLayout(settings.experimentalUiLayout || 'off');
   if ($('stgExpUiLayout')) $('stgExpUiLayout').value = settings.experimentalUiLayout || 'off';
+}
+
+function formatLocalDate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+function parseDateValue(value) {
+  if (!value) return null;
+  const [y, m, d] = value.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  return isNaN(date) ? null : date;
+}
+function advanceRecurringDate(date, interval) {
+  const d = new Date(date);
+  if (interval === 'weekly') d.setDate(d.getDate() + 7);
+  else if (interval === 'monthly') d.setMonth(d.getMonth() + 1);
+  else if (interval === 'yearly') d.setFullYear(d.getFullYear() + 1);
+  return d;
+}
+function getCategoryMonthlySpend(category) {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  return transactions.filter(t => t.type === 'expense' && t.category === category && new Date(t.createdAt) >= monthStart)
+    .reduce((sum, t) => sum + t.amount, 0);
+}
+function updateCategoryBudgetSummary() {
+  const list = $('budgetSummaryList');
+  const empty = $('budgetSummaryEmpty');
+  if (!list || !empty) return;
+  const categories = [...new Set([...DEFAULT_CATEGORIES.map(c => c.name), ...customCategories.map(c => c.name)])];
+  const rows = categories.map((cat) => {
+    const limit = Number(categoryBudgets[cat] || 0);
+    if (!limit) return null;
+    const spent = getCategoryMonthlySpend(cat);
+    const pct = Math.min(100, limit ? Math.round((spent / limit) * 100) : 0);
+    const over = spent > limit;
+    return `<div class="budget-row ${over ? 'over-budget' : pct >= 90 ? 'near-budget' : ''}">
+      <div class="budget-row-title">
+        <span>${escHtml(cat)}</span>
+        <span>${currency}${spent.toFixed(2)} / ${currency}${limit.toFixed(2)}</span>
+      </div>
+      <div class="budget-progress-bar"><div style="width:${pct}%"></div></div>
+      <div class="budget-row-meta">${t(over ? 'budgetExceeded' : 'budgetProgress')}: ${pct}%</div>
+    </div>`;
+  }).filter(Boolean);
+  list.innerHTML = rows.join('');
+  empty.style.display = rows.length ? 'none' : '';
+}
+function renderCategoryBudgets() {
+  const list = $('categoryBudgetList');
+  if (!list) return;
+  const categories = DEFAULT_CATEGORIES.map(c => c.name);
+  const rows = categories.map((cat) => {
+    const value = categoryBudgets[cat] || '';
+    const spent = getCategoryMonthlySpend(cat);
+    return `<div class="setting-row budget-setting-row">
+      <div style="flex:1;min-width:0">
+        <div class="setting-name">${escHtml(cat)}</div>
+        <div class="setting-desc">${t('budgetSpent')}: ${currency}${spent.toFixed(2)} / ${currency}${(value ? Number(value) : 0).toFixed(2)}</div>
+      </div>
+      <input type="number" min="0" step="1" value="${escHtml(value)}" onchange="saveCategoryBudget('${escHtml(cat)}', this.value)" class="budget-input">
+    </div>`;
+  });
+  list.innerHTML = rows.join('');
+  updateCategoryBudgetSummary();
+}
+function renderCustomCategoryBudgets() {
+  const list = $('customCategoryBudgetList');
+  if (!list) return;
+  if (!customCategories.length) {
+    list.innerHTML = `<div class="setting-desc" style="padding:6px 0">${t('noCustomCats')}</div>`;
+    return;
+  }
+  const rows = customCategories.map((cat) => {
+    const value = categoryBudgets[cat.name] || '';
+    const spent = getCategoryMonthlySpend(cat.name);
+    return `<div class="setting-row budget-setting-row">
+      <div style="flex:1;min-width:0">
+        <div class="setting-name">${escHtml(cat.emoji)} ${escHtml(cat.name)}</div>
+        <div class="setting-desc">${t('budgetSpent')}: ${currency}${spent.toFixed(2)} / ${currency}${(value ? Number(value) : 0).toFixed(2)}</div>
+      </div>
+      <input type="number" min="0" step="1" value="${escHtml(value)}" onchange="saveCategoryBudget('${escHtml(cat.name)}', this.value)" class="budget-input">
+    </div>`;
+  });
+  list.innerHTML = rows.join('');
+}
+function saveCategoryBudget(category, value) {
+  categoryBudgets[category] = Number(value) || 0;
+  saveData();
+  renderCategoryBudgets();
+  renderCustomCategoryBudgets();
+}
+function renderRecurringTemplates() {
+  const list = $('recurringList');
+  if (!list) return;
+  if (!recurringTemplates.length) {
+    list.innerHTML = `<div class="setting-desc">${t('noRecurringTx')}</div>`;
+    return;
+  }
+  list.innerHTML = recurringTemplates.map((tpl, idx) => {
+    const intervalLabel = t('recurrence' + tpl.interval.charAt(0).toUpperCase() + tpl.interval.slice(1));
+    return `<div class="recurring-template">
+      <div>
+        <div class="setting-name">${escHtml(tpl.name)} <span class="recurring-label">${t('recurringTag')} ${intervalLabel}</span></div>
+        <div class="setting-desc">${t('nextDue')}: ${escHtml(tpl.nextDue)} • ${currency}${tpl.amount.toFixed(2)}</div>
+      </div>
+      <button class="btn sm-btn danger-outline" onclick="removeRecurringTemplate(${idx})" data-i18n="removeTip">×</button>
+    </div>`;
+  }).join('');
+}
+function removeRecurringTemplate(idx) {
+  recurringTemplates.splice(idx, 1);
+  saveData();
+  renderRecurringTemplates();
+  updateUI();
+}
+function processRecurringTransactions() {
+  const today = new Date();
+  let changed = false;
+  recurringTemplates = recurringTemplates.map((tpl) => {
+    let nextDue = parseDateValue(tpl.nextDue) || new Date();
+    while (nextDue <= today) {
+      transactions.push({
+        name: tpl.name,
+        amount: tpl.amount,
+        type: tpl.type,
+        category: tpl.category,
+        note: tpl.note || '',
+        createdAt: new Date(nextDue.getFullYear(), nextDue.getMonth(), nextDue.getDate()).toISOString(),
+      });
+      if (tpl.type === 'income') balance += tpl.amount;
+      else balance -= tpl.amount;
+      nextDue = advanceRecurringDate(nextDue, tpl.interval);
+      changed = true;
+    }
+    tpl.nextDue = formatLocalDate(nextDue);
+    return tpl;
+  });
+  if (changed) saveData();
+}
+function updateGoalDeadlineValue() {
+  const input = $('goalDeadline');
+  if (!input) return;
+  const value = input.value || '';
+  if (!value) {
+    goalDeadline = '';
+    input.setCustomValidity('');
+    saveData();
+    updateProgress();
+    return;
+  }
+  if (!isValidGoalDeadline(value)) {
+    input.setCustomValidity('Please choose a deadline after today and within 100 years.');
+    input.reportValidity();
+    input.value = goalDeadline || '';
+    return;
+  }
+  input.setCustomValidity('');
+  goalDeadline = value;
+  saveData();
+  updateProgress();
 }
 
 /* ── Rolling Number Animation ─────────────────────────── */
@@ -3737,6 +3961,7 @@ function addCustomCategory() {
   saveData();
   populateCategorySelects();
   renderCustomCatList();
+  renderCategoryBudgets();
   closeAddCustomCategory();
 }
 
@@ -3745,6 +3970,20 @@ function deleteCustomCategory(idx) {
   saveData();
   populateCategorySelects();
   renderCustomCatList();
+  renderCategoryBudgets();
+  renderCustomCategoryBudgets();
+}
+
+function openCustomCategoryBudgetModal() {
+  const modal = $('customCategoryBudgetModal');
+  if (!modal) return;
+  renderCustomCategoryBudgets();
+  modal.style.display = 'flex';
+}
+function closeCustomCategoryBudgetModal() {
+  const modal = $('customCategoryBudgetModal');
+  if (!modal) return;
+  modal.style.display = 'none';
 }
 
 /* ── Predefined Transactions ──────────────────────────── */
@@ -3978,6 +4217,7 @@ function runGalaxy() {
 
 /* ── Init ─────────────────────────────────────────────── */
 loadData();
+processRecurringTransactions();
 applySettings();
 initLoader();
 initCosmicBg();
@@ -3985,7 +4225,7 @@ initNebulaParallax();
 updateSortUI();
 renderPredefined();
 // Close new modals on backdrop click
-['addCustomCategoryModal'].forEach(id=>{
+['addCustomCategoryModal','customCategoryBudgetModal'].forEach(id=>{
   const el=$(id); if(el) el.addEventListener('click',e=>{ if(e.target===el) el.style.display='none'; });
 });
 

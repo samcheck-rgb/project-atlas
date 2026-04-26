@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="experimental-themes.css">
+  <link rel="stylesheet" href="atlas-extras.css">
+  <link rel="stylesheet" href="atlas-qol-extra.css">
 </head>
 <body>
 
@@ -94,11 +96,24 @@
     <div class="card saving-goal-card" id="savingGoalCard">
       <h3 data-i18n="savingGoal">Saving Goal</h3>
       <div class="goal-row">
+        <label for="goal" class="goal-label" data-i18n="goalLabel">Amount</label>
         <input id="goal" type="number" placeholder="Set target amount" data-i18n-placeholder="phGoal" oninput="updateProgress()">
         <span class="goal-currency" id="goalCurrency">$</span>
       </div>
+      <div class="goal-deadline-row">
+        <label for="goalDeadline" data-i18n="deadline">Deadline</label>
+        <input id="goalDeadline" type="date" onchange="updateGoalDeadlineValue()">
+      </div>
       <div class="progress" id="progress"><span>0%</span></div>
       <div class="progress-label" id="progressLabel" data-i18n="setGoal">Set a goal to track your progress</div>
+    </div>
+
+    <div class="card budget-card" id="budgetSummaryCard">
+      <div class="budget-summary-header">
+        <h3 data-i18n="budgetSummary">Budget Summary</h3>
+      </div>
+      <div id="budgetSummaryList" class="budget-summary-list"></div>
+      <div id="budgetSummaryEmpty" class="empty-state" style="display:none" data-i18n="budgetNoLimits">No category budgets set yet. Add them in Settings.</div>
     </div>
 
     <!-- ANALYTICS CARD -->
@@ -192,6 +207,15 @@
         <select id="txCategory"></select>
         <button type="button" class="btn sm-btn" onclick="openAddCustomCategory()" data-i18n-title="addCustomCategoryTip" title="Add custom category" style="flex-shrink:0;padding:8px 10px;">+</button>
       </div>
+    </div>
+    <div class="field">
+      <label data-i18n="recurrence">Recurrence</label>
+      <select id="txRecurrence">
+        <option value="none" data-i18n="recurrenceNone">None</option>
+        <option value="weekly" data-i18n="recurrenceWeekly">Weekly</option>
+        <option value="monthly" data-i18n="recurrenceMonthly">Monthly</option>
+        <option value="yearly" data-i18n="recurrenceYearly">Yearly</option>
+      </select>
     </div>
     <div class="field"><label data-i18n="note">Note <span class="opt-label" data-i18n="optional">(optional)</span></label><textarea id="txNote" placeholder="Add a note…" data-i18n-placeholder="phNote" rows="2"></textarea></div>
     <div class="field predefined-field">
@@ -346,10 +370,23 @@
       </div>
 
       <!-- CUSTOM CATEGORIES -->
-      <div class="settings-section">
+      <div class="settings-section" id="customCategoriesSection">
         <div class="settings-section-title"><span class="stg-ico">≡</span> <span data-i18n="customCategories">Custom Categories</span></div>
         <div id="customCatList" class="custom-cat-list"></div>
         <button class="btn sm-btn primary" style="margin-top:10px;width:100%" onclick="openAddCustomCategory()" data-i18n="addCustomCategory">+ Add Custom Category</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title"><span class="stg-ico">▤</span> <span data-i18n="categoryBudgetsSection">Category Budgets</span></div>
+        <div class="setting-desc" style="margin-bottom:12px" data-i18n="categoryBudgetsDesc">Set monthly spending limits for each category. Progress updates automatically.</div>
+        <div id="categoryBudgetList" class="budget-list"></div>
+        <button type="button" class="btn sm-btn" style="margin-top:10px;width:100%" onclick="openCustomCategoryBudgetModal()" data-i18n="viewCustomCategories">View custom categories</button>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title"><span class="stg-ico">↻</span> <span data-i18n="recurringSection">Recurring Transactions</span></div>
+        <div class="setting-desc" style="margin-bottom:12px" data-i18n="recurringDesc">Create entries that repeat automatically from the Add Transaction modal.</div>
+        <div id="recurringList" class="recurring-list"></div>
       </div>
 
       <!-- QUICK TRANSACTIONS MANAGEMENT -->
@@ -405,6 +442,7 @@
         <div class="settings-section-title" data-i18n="data">Data</div>
         <div class="data-btns">
           <button class="btn primary" onclick="exportData()" data-i18n="exportData">↑ Export Data</button>
+          <button class="btn" onclick="exportCsv()" data-i18n="exportCsv">⇅ Export CSV</button>
           <label class="btn" style="cursor:pointer;text-align:center"><span data-i18n="importData">↓ Import Data</span><input type="file" id="importFile" accept=".json" onchange="importData(this)" style="display:none"></label>
         </div>
         <div class="setting-desc" style="margin-top:8px;line-height:1.5" data-i18n="dataDesc">
@@ -582,7 +620,44 @@
   </div>
 </div>
 
+<div id="customCategoryBudgetModal" class="modal full-modal">
+  <div class="modal-content full-modal-content">
+    <div class="modal-header">
+      <h3><span class="stg-ico">▤</span> <span data-i18n="customCategoryBudgetTitle">Custom Category Budgets</span></h3>
+      <button class="modal-close" onclick="closeCustomCategoryBudgetModal()">✕</button>
+    </div>
+    <div id="customCategoryBudgetList" class="budget-list"></div>
+  </div>
+</div>
+
+<!-- ═══ ADD CUSTOM UI / THEME (file + name, like Add Song) ═══ -->
+<div id="addCustomCssModal" class="modal mini-modal">
+  <div class="modal-content mini-content">
+    <div class="modal-header">
+      <h3><span class="stg-ico">✦</span> <span id="addCustomCssTitle">Import Custom UI</span></h3>
+      <button class="modal-close" onclick="atlasCloseAddCustomCss()">✕</button>
+    </div>
+    <div class="field">
+      <label id="addCustomCssFileLabel">CSS File</label>
+      <label class="file-input-label">
+        <input type="file" id="addCustomCssFile" accept=".css,text/css,text/plain,*/*" onchange="atlasPreviewCustomCss(this)">
+        <span id="addCustomCssFileName">Choose .css file…</span>
+      </label>
+    </div>
+    <div class="field">
+      <label id="addCustomCssNameLabel">Name</label>
+      <input id="addCustomCssName" placeholder="e.g. My Sunset Theme" maxlength="60">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="atlasCloseAddCustomCss()">Cancel</button>
+      <button class="btn primary" onclick="atlasConfirmAddCustomCss()" id="addCustomCssConfirmBtn">Import</button>
+    </div>
+  </div>
+</div>
+
 <audio id="audioPlayer" preload="metadata"></audio>
 <script src="script.js"></script>
+<script src="atlas-extras.js"></script>
+<script src="atlas-qol-extra.js"></script>
 </body>
 </html>

@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════════════════════════
+   PROJECT ATLAS — Custom Theme Template
+   Save a copy of this file, edit the values below, then import
+   it via Settings → Experimental → Custom Theme → Import.
+   The import is persisted in your browser and applied on every
+   load (until you remove it).
+
+   All variables are scoped to body[data-exp-theme="custom"]
+   so they only apply when "Custom (Imported)" is the active
+   experimental theme.
+   ═══════════════════════════════════════════════════════════ */
+
+body[data-exp-theme="custom"] {
+  /* === Surfaces === */
+  --bg:      #0b0f1a;     /* page background */
+  --bg2:     #131a2e;     /* secondary background (modals, panels) */
+  --card:    rgba(255,255,255,0.05);   /* card background */
+  --border:  rgba(255,255,255,0.12);   /* borders / dividers */
+
+  /* === Text === */
+  --text:    #ecf1ff;     /* primary text */
+  --muted:   #8390ad;     /* muted / secondary text */
+
+  /* === Brand / accent === */
+  --accent:  #7c5cff;     /* main accent (links, focus, primary buttons) */
+
+  /* === Money === */
+  --income:  #4ade80;     /* income amount */
+  --expense: #ff6b88;     /* expense amount */
+
+  /* === Effects === */
+  --shadow:  rgba(0,0,0,0.55);
+
+  /* === Typography (optional) ===
+     Uncomment and pick any installed/Google font you imported. */
+  /* font-family: 'JetBrains Mono', monospace; */
+}
+
+/* Light-mode override — used when the user toggles ☾ → ☀ */
+[data-theme="light"] body[data-exp-theme="custom"] {
+  --bg:      #f5f7fb;
+  --bg2:     #e9eef8;
+  --card:    rgba(255,255,255,0.85);
+  --border:  rgba(0,0,0,0.10);
+  --text:    #131a2e;
+  --muted:   #5a6478;
+  --shadow:  rgba(0,0,0,0.18);
+}
+
+/* === Optional component overrides ===
+   Anything below is fully optional — tweak / delete freely. */
+
+body[data-exp-theme="custom"] header {
+  /* background: linear-gradient(180deg, var(--bg2), transparent); */
+}
+
+body[data-exp-theme="custom"] .card {
+  /* border-radius: 18px; */
+  /* box-shadow: 0 12px 40px var(--shadow); */
+}
+
+body[data-exp-theme="custom"] .fab {
+  /* background: var(--accent); */
+  /* color: #fff; */
+}

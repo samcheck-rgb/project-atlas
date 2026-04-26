@@ -1,0 +1,405 @@
+/* ═══════════════════════════════════════════════════════════
+   PROJECT ATLAS — atlas-extras.css
+   Loaded AFTER styles.css and experimental-themes.css.
+   Adds: bug fixes + new QoL features (first-run modal, wipe
+   warning, custom UI/theme imports, number-input hardening,
+   number-only input toast, hide quick-tx scrollbar, modal
+   backdrop hardening).
+   All styling uses existing CSS variables so it adapts to
+   every theme (light/dark, mono, cumulus, ledger, prism,
+   aurora, obsidian, custom).
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 1. Hide stray sidebar collapse button on mobile / when
+       the sidebar layout isn't active ───────────────────────── */
+.sidebar-collapse-btn { display: none !important; }
+body[data-ui-layout="sidebar"] .sidebar-collapse-btn {
+  display: flex !important;
+}
+@media (max-width: 1023px) {
+  body[data-ui-layout="sidebar"] .sidebar-collapse-btn {
+    display: none !important;
+  }
+}
+
+/* ── 2. Hide quick-transactions scroll bar (still scrollable) ── */
+#predefinedCard,
+#predefinedGrid {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#predefinedCard::-webkit-scrollbar,
+#predefinedGrid::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* ── 3. Kill native number-input spinners everywhere ────────── */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ── 4. Modal backdrop hardening (no bleed-through) ─────────── */
+.modal {
+  background: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+[data-theme="light"] .modal {
+  background: rgba(20, 24, 40, 0.45) !important;
+}
+.modal .modal-content {
+  background: var(--card, #11192b) !important;
+  background-color: var(--bg2, #0d1628) !important;
+}
+/* If user enabled liquid glass, keep glass for content but keep backdrop opaque-ish */
+body.liquid-glass .modal .modal-content {
+  background: color-mix(in oklab, var(--bg2, #0d1628) 88%, transparent) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* ── 5. Number-only toast ──────────────────────────────────── */
+.atlas-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(20px);
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: var(--card, #161e30);
+  color: var(--text, #e5e7eb);
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  font-size: 0.9rem;
+  font-family: inherit;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 99999;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.atlas-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.atlas-toast.warn {
+  border-color: var(--expense, #f87171);
+  color: var(--expense, #f87171);
+}
+
+/* ── 6. First-run modal (Welcome) ─────────────────────────── */
+#welcomeModal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100000;
+  padding: 20px;
+}
+#welcomeModal.show { display: flex; }
+#welcomeModal .welcome-card {
+  background: var(--bg2, #0d1628);
+  color: var(--text, #e5e7eb);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: 18px;
+  padding: 28px 24px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  font-family: inherit;
+  animation: welcomePop 0.5s cubic-bezier(.2,.9,.3,1.2);
+}
+@keyframes welcomePop {
+  from { transform: translateY(20px) scale(.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+#welcomeModal h2 {
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--accent, #4ade80), #38bdf8);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+#welcomeModal .welcome-sub {
+  color: var(--muted, #6b7280);
+  font-size: 0.85rem;
+  margin-bottom: 22px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+#welcomeModal label {
+  display: block;
+  text-align: left;
+  font-size: 0.8rem;
+  color: var(--muted, #6b7280);
+  margin: 14px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+#welcomeModal input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  background: var(--card, rgba(255,255,255,0.04));
+  color: var(--text, #e5e7eb);
+  font-family: inherit;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+#welcomeModal input:focus {
+  border-color: var(--accent, #4ade80);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent, #4ade80) 25%, transparent);
+}
+#welcomeModal .welcome-actions {
+  margin-top: 22px;
+  display: flex;
+  gap: 10px;
+}
+#welcomeModal .welcome-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: transform 0.15s, opacity 0.15s;
+}
+#welcomeModal .welcome-actions button:hover { transform: translateY(-1px); }
+#welcomeModal .welcome-skip {
+  background: transparent;
+  color: var(--muted, #6b7280);
+  border: 1px solid var(--border, rgba(255,255,255,0.12)) !important;
+}
+#welcomeModal .welcome-go {
+  background: var(--accent, #4ade80);
+  color: #0a0a0a;
+}
+
+/* Greeting in header */
+.atlas-greeting {
+  font-size: 0.78rem;
+  color: var(--muted, #6b7280);
+  margin-right: 10px;
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+@media (max-width: 600px) {
+  .atlas-greeting { display: none; }
+}
+
+/* ── 7. Wipe-data button + countdown ──────────────────────── */
+.danger-btn-wipe {
+  background: transparent !important;
+  color: var(--expense, #f87171) !important;
+  border: 1px solid var(--expense, #f87171) !important;
+}
+#wipeDataModal .countdown-btn {
+  position: relative;
+  overflow: hidden;
+}
+#wipeDataModal .countdown-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+#wipeDataModal .countdown-btn .cd-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--expense, #f87171);
+  opacity: 0.2;
+  width: 0%;
+  transition: width 3s linear;
+  pointer-events: none;
+}
+#wipeDataModal .warn-strong {
+  color: var(--expense, #f87171);
+  font-weight: 700;
+}
+
+/* ── 8. Custom UI / theme rows ────────────────────────────── */
+.atlas-import-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.atlas-import-row label.btn,
+.atlas-import-row button.btn {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  cursor: pointer;
+}
+.atlas-loaded-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--accent, #4ade80) 18%, transparent);
+  color: var(--accent, #4ade80);
+  font-size: 0.7rem;
+  margin-left: 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── 9. Greeting visibility in sidebar layout ───────────────
+   Hide greeting text whenever the sidebar layout is collapsed
+   (icons-only mode). Show normally otherwise. */
+body[data-ui-layout="sidebar"].sidebar-collapsed .atlas-greeting {
+  display: none !important;
+}
+
+/* ── 10. Bigger Settings (QoL toggle) ────────────────────── */
+body.atlas-bigger-settings #settingsMenu .settings-content {
+  max-width: min(960px, 96vw) !important;
+  width: 96vw;
+}
+body.atlas-bigger-settings #settingsMenu .settings-body {
+  max-height: 78vh;
+}
+@media (min-width: 900px) {
+  body.atlas-bigger-settings #settingsMenu .settings-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 22px;
+    align-items: start;
+  }
+  body.atlas-bigger-settings #settingsMenu .settings-section {
+    margin: 0;
+  }
+}
+
+/* ── 11. Privacy / hide-balance mode ─────────────────────── */
+body.atlas-privacy .balance-amount,
+body.atlas-privacy #balance,
+body.atlas-privacy #totalIncome,
+body.atlas-privacy #totalExpense,
+body.atlas-privacy .tx-amount,
+body.atlas-privacy .stat-value,
+body.atlas-privacy [data-tx-amount] {
+  filter: blur(9px);
+  transition: filter 0.18s ease;
+  user-select: none;
+}
+body.atlas-privacy .balance-amount:hover,
+body.atlas-privacy .tx-amount:hover {
+  filter: blur(0);
+}
+
+/* ── 12. Shortcuts help modal ────────────────────────────── */
+#atlasShortcutsModal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(6px);
+  z-index: 100000;
+  display: none; align-items: center; justify-content: center;
+}
+#atlasShortcutsModal.show { display: flex; }
+#atlasShortcutsModal .sc-card {
+  background: var(--card, #161b22);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: 14px;
+  padding: 22px;
+  width: min(440px, 92vw);
+  color: var(--text, #e6edf3);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+#atlasShortcutsModal h3 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#atlasShortcutsModal .sc-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border, rgba(255,255,255,0.08));
+  font-size: 0.88rem;
+}
+#atlasShortcutsModal .sc-row:last-child { border-bottom: none; }
+#atlasShortcutsModal kbd {
+  background: var(--bg, #0d1117);
+  border: 1px solid var(--border, rgba(255,255,255,0.15));
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--accent, #4ade80);
+}
+#atlasShortcutsModal .sc-close {
+  background: transparent; border: none; color: var(--muted, #888);
+  cursor: pointer; font-size: 1.1rem;
+}
+
+/* ── Custom UI / Theme library list (multi-entry) ─────────── */
+.atlas-lib-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.atlas-lib-empty {
+  font-size: 0.78rem;
+  color: var(--muted, #6b7280);
+  font-style: italic;
+  padding: 6px 4px;
+}
+.atlas-lib-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--card, rgba(255,255,255,0.04)) 70%, transparent);
+  transition: border-color 0.2s, background 0.2s;
+}
+.atlas-lib-item.active {
+  border-color: var(--accent, #4ade80);
+  background: color-mix(in oklab, var(--accent, #4ade80) 10%, transparent);
+}
+.atlas-lib-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--text, #e5e7eb);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.atlas-lib-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.atlas-lib-actions .btn.sm-btn {
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  min-height: 0;
+  line-height: 1.2;
+}
+@media (max-width: 540px) {
+  .atlas-lib-item { flex-direction: column; align-items: stretch; }
+  .atlas-lib-actions { justify-content: flex-start; }
+}
